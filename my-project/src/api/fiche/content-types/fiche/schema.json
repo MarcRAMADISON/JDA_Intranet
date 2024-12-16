@@ -1,0 +1,51 @@
+{
+  "kind": "collectionType",
+  "collectionName": "fiches",
+  "info": {
+    "singularName": "fiche",
+    "pluralName": "fiches",
+    "displayName": "fiche"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "responsable": {
+      "type": "string"
+    },
+    "localisation": {
+      "type": "string"
+    },
+    "secteurActivite": {
+      "type": "string"
+    },
+    "etablissement": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "ligneDirecte": {
+      "type": "string"
+    },
+    "statut": {
+      "type": "string"
+    },
+    "telephoneStandard": {
+      "type": "string"
+    },
+    "nbEtoile": {
+      "type": "integer"
+    },
+    "nbFollowers": {
+      "type": "biginteger"
+    },
+    "reseauxSociaux": {
+      "type": "string"
+    },
+    "siteWeb": {
+      "type": "string"
+    }
+  }
+}
