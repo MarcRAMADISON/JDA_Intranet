@@ -116,6 +116,7 @@ function AddFiche({
               setValues(defaultValues);
               setShowMessage("SUCCESS");
               setReload((prev) => !prev);
+              setOpenModal(false)
             } else {
               setShowMessage("ERROR");
             }

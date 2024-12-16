@@ -5,6 +5,10 @@ import Paper from "@mui/material/Paper";
 import {
   Box,
   Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   Table,
   TableBody,
   TableCell,
@@ -54,7 +58,6 @@ export default function CustomTable({
     setCurrentRow(row);
   }, []);
 
-
   return (
     <Box sx={{ height: "100%", width: "100%", mt: "50px", mb: "50px" }}>
       <CustomModal open={openModal} setOpen={setOpenModal}>
@@ -73,7 +76,7 @@ export default function CustomTable({
         <Table>
           <TableHead>
             <TableRow style={{ backgroundColor: "#1976d2" }}>
-            <TableCell
+              <TableCell
                 style={{
                   fontSize: "0.9rem",
                   color: "#fff",
@@ -213,7 +216,9 @@ export default function CustomTable({
                     },
                   }}
                 >
-                  <TableCell>{moment(row.createdAt).format('HH/mm/YYYY')}</TableCell>
+                  <TableCell>
+                    {moment(row.createdAt).format("HH/mm/YYYY")}
+                  </TableCell>
                   <TableCell>{row.responsable}</TableCell>
                   <TableCell>{row.etablissement}</TableCell>
                   <TableCell>{row.secteurActivite}</TableCell>
@@ -229,8 +234,10 @@ export default function CustomTable({
                   </TableCell>
                   <TableCell>{row.nbFollowers}</TableCell>
                   <TableCell>{row.siteWeb}</TableCell>
-                  <TableCell sx={statusStyle}>{row.statut}</TableCell>
-                  <TableCell sx={{ display: "flex"}}>
+                  <TableCell sx={{ ...statusStyle, cursor: "pointer",minWidth:'100px' }}>
+                   {row.statut}
+                  </TableCell>
+                  <TableCell sx={{ display: "flex" }}>
                     <Button
                       size="small"
                       variant="outlined"
