@@ -8,6 +8,7 @@ import {
   MenuItem,
   Pagination,
   Select,
+  Typography,
 } from "@mui/material";
 import MenuBar from "../components/MenuBar/page";
 import CustomTable from "../components/Table/page";
@@ -32,7 +33,7 @@ async function getData({filter,start,limit}:{filter?: string,start?:number,limit
       }
     );
   } else {
-    rows = await fetch(`http://localhost:1337/api/fiches?pagination[start]=${start || 0}&pagination[limit]=${limit || 5}`, {
+    rows = await fetch(`http://localhost:1337/api/fiches?pagination[start]=${start || 0}&pagination[limit]=${limit || 20}`, {
       method: "GET",
       headers: {
         "Content-type": "application/json; charset=UTF-8",
@@ -58,6 +59,7 @@ function Home() {
         const data = (res?.data || []).map((d) => ({
           id: d.id,
           ...d.attributes,
+          total:res?.meta?.pagination?.total || 0
         }));
         setRows(data);
       });
@@ -71,12 +73,13 @@ function Home() {
     event.preventDefault();
     setStatut(event.target.value);
     if (event.target.value === "TOUT") {
-      getData({start:0,limit:5})
+      getData({start:0,limit:20})
         .then((res) => res.json())
         .then((res) => {
           const data = (res?.data || []).map((d) => ({
             id: d.id,
             ...d.attributes,
+            total:res?.meta?.pagination?.total || 0
           }));
           setRows(data);
         });
@@ -87,6 +90,7 @@ function Home() {
           const data = (res?.data || []).map((d) => ({
             id: d.id,
             ...d.attributes,
+            total:res?.meta?.pagination?.total || 0
           }));
           setRows(data);
         });
@@ -94,12 +98,22 @@ function Home() {
   }, []);
 
   const handleChangePagination=useCallback((event:any,page:number)=>{
-    console.log('event',page)
-  },[])
+    event.preventDefault()
+    getData({filter:statut,start:20 * (page - 1),limit:20})
+        .then((res) => res.json())
+        .then((res) => {
+          const data = (res?.data || []).map((d) => ({
+            id: d.id,
+            ...d.attributes,
+            total:res?.meta?.pagination?.total || 0
+          }));
+          setRows(data);
+        });
+  },[statut])
 
   return (
     <Box
-      sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+      sx={{ display: "flex", flexDirection: "column", alignItems: "center",mb:'100px' }}
     >
       <MenuBar />
       <AddFiche
@@ -158,10 +172,13 @@ function Home() {
         sx={{
           width: "100%",
           display: "flex",
+          flexDirection:"column",
           justifyContent: "center",
+          alignItems:"center"
         }}
       >
-        <Pagination count={rows?.length} color="primary" onChange={handleChangePagination}/>
+        <Pagination count={Math.ceil(rows[0]?.total/20)} color="primary" onChange={handleChangePagination}/>
+        <Typography variant="body1" sx={{mt:'30px'}}>Nombre total des fiches : {rows[0]?.total || 0}</Typography>
       </Box>
       </Box>
     </Box>
