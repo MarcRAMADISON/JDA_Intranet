@@ -26,9 +26,12 @@ export default function Login() {
     password: "",
   });
   const [showError,setShowError]=useState<boolean>(false);
+  const [disabled,setDisabled]=useState<boolean>(false);
 
   const handleConnect = useCallback(() => {
     if (values.identifier && values.password) {
+      setDisabled(true)
+
       fetch("http://localhost:1337/api/auth/local", {
         method: "POST",
         headers: {
@@ -40,14 +43,18 @@ export default function Login() {
           password: values.password,
         }),
       }).then((res)=>res.json()).then((res)=>{
+        setDisabled(false)
         if(res.status === 200 || res?.jwt){
-          setAuthCookie({cookies:res?.jwt})
+          setAuthCookie({cookies:res?.jwt,user:JSON.stringify(res?.user)})
           route.push('/home')
         }else{
           setShowError(true)
         }
 
-      }).catch(()=>setShowError(true));
+      }).catch(()=>{
+        setDisabled(false)
+        setShowError(true)
+      });
     }
   }, [values,route]);
 
@@ -109,7 +116,7 @@ export default function Login() {
           />
         </Box>
         <Button
-          disabled={!values.identifier || !values.password}
+          disabled={!values.identifier || !values.password || disabled }
           sx={{ width: "50%", placeSelf: "center", marginTop: "30px" }}
           onClick={handleConnect}
           variant="contained"

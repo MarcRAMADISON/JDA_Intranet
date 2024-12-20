@@ -39,14 +39,20 @@
     "nbEtoile": {
       "type": "decimal"
     },
-    "reseauxSociaux": {
-      "type": "string"
-    },
     "nbFollowers": {
       "type": "biginteger"
     },
+    "reseauxSociaux": {
+      "type": "string"
+    },
     "siteWeb": {
       "type": "string"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "fiches"
     }
   }
 }

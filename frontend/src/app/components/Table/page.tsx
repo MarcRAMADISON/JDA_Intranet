@@ -5,10 +5,6 @@ import Paper from "@mui/material/Paper";
 import {
   Box,
   Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
   Table,
   TableBody,
   TableCell,
@@ -62,7 +58,12 @@ export default function CustomTable({
     <Box sx={{ height: "100%", width: "100%", mt: "50px", mb: "50px" }}>
       <CustomModal open={openModal} setOpen={setOpenModal}>
         <Typography>Voulez-vous vraiment supprimer cette fiche?</Typography>
-        <Button variant="contained" sx={{ mt: "30px" }} onClick={handleDelete}>
+        <Button
+          variant="contained"
+          color="error"
+          sx={{ mt: "30px" }}
+          onClick={handleDelete}
+        >
           Confirmer
         </Button>
       </CustomModal>
@@ -81,6 +82,7 @@ export default function CustomTable({
                   fontSize: "0.9rem",
                   color: "#fff",
                   fontWeight: "bold",
+                  minWidth: "150px",
                 }}
               >
                 Date création
@@ -90,6 +92,17 @@ export default function CustomTable({
                   fontSize: "0.9rem",
                   color: "#fff",
                   fontWeight: "bold",
+                  minWidth: "150px",
+                }}
+              >
+                Créé par
+              </TableCell>
+              <TableCell
+                style={{
+                  fontSize: "0.9rem",
+                  color: "#fff",
+                  fontWeight: "bold",
+                  minWidth: "150px",
                 }}
               >
                 Responsable
@@ -99,6 +112,7 @@ export default function CustomTable({
                   fontSize: "0.9rem",
                   color: "#fff",
                   fontWeight: "bold",
+                  minWidth: "150px",
                 }}
               >
                 Etablissement
@@ -108,6 +122,7 @@ export default function CustomTable({
                   fontSize: "0.9rem",
                   color: "#fff",
                   fontWeight: "bold",
+                  minWidth: "150px",
                 }}
               >
                 Secteur d&apos;activité
@@ -117,6 +132,7 @@ export default function CustomTable({
                   fontSize: "0.9rem",
                   color: "#fff",
                   fontWeight: "bold",
+                  minWidth: "150px",
                 }}
               >
                 Localisation
@@ -126,6 +142,7 @@ export default function CustomTable({
                   fontSize: "0.9rem",
                   color: "#fff",
                   fontWeight: "bold",
+                  minWidth: "150px",
                 }}
               >
                 Téléphone standard
@@ -135,6 +152,7 @@ export default function CustomTable({
                   fontSize: "0.9rem",
                   color: "#fff",
                   fontWeight: "bold",
+                  minWidth: "150px",
                 }}
               >
                 Ligne direct
@@ -144,6 +162,7 @@ export default function CustomTable({
                   fontSize: "0.9rem",
                   color: "#fff",
                   fontWeight: "bold",
+                  minWidth: "150px",
                 }}
               >
                 Adresse e-mail
@@ -153,7 +172,7 @@ export default function CustomTable({
                   fontSize: "0.9rem",
                   color: "#fff",
                   fontWeight: "bold",
-                  maxWidth: "60px",
+                  minWidth: "150px",
                 }}
               >
                 Réseaux sociaux
@@ -163,6 +182,7 @@ export default function CustomTable({
                   fontSize: "0.9rem",
                   color: "#fff",
                   fontWeight: "bold",
+                  minWidth: "150px",
                 }}
               >
                 Nb étoile
@@ -172,6 +192,7 @@ export default function CustomTable({
                   fontSize: "0.9rem",
                   color: "#fff",
                   fontWeight: "bold",
+                  minWidth: "150px",
                 }}
               >
                 Nb followers
@@ -181,6 +202,7 @@ export default function CustomTable({
                   fontSize: "0.9rem",
                   color: "#fff",
                   fontWeight: "bold",
+                  minWidth: "150px",
                 }}
               >
                 Site web
@@ -190,6 +212,7 @@ export default function CustomTable({
                   fontSize: "0.9rem",
                   color: "#fff",
                   fontWeight: "bold",
+                  minWidth: "150px",
                 }}
               >
                 Statut
@@ -211,33 +234,134 @@ export default function CustomTable({
                   key={row.id}
                   sx={{
                     backgroundColor: index % 2 === 0 ? "#f5f5f5" : "#ffffff",
+                    cursor: "pointer",
+                    zIndex: 9,
+                    width: "90%",
                     "&:hover": {
                       backgroundColor: "#e0e0e0",
                     },
                   }}
                 >
-                  <TableCell>
-                    {moment(row.createdAt).format("HH/mm/YYYY")}
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                  >
+                    {moment(row.createdAt).format("DD/MM/YYYY")}
                   </TableCell>
-                  <TableCell>{row.responsable}</TableCell>
-                  <TableCell>{row.etablissement}</TableCell>
-                  <TableCell>{row.secteurActivite}</TableCell>
-                  <TableCell>{row.localisation}</TableCell>
-                  <TableCell>{row.telephoneStandard}</TableCell>
-                  <TableCell>{row.ligneDirecte}</TableCell>
-                  <TableCell>{row.email}</TableCell>
-                  <TableCell sx={{ maxWidth: "100px", overflow: "hidden" }}>
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                  >
+                    {row.user.data.attributes.username}
+                  </TableCell>
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                  >
+                    {row.responsable}
+                  </TableCell>
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                  >
+                    {row.etablissement}
+                  </TableCell>
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                  >
+                    {row.secteurActivite}
+                  </TableCell>
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                  >
+                    {row.localisation}
+                  </TableCell>
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                  >
+                    {row.telephoneStandard}
+                  </TableCell>
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                  >
+                    {row.ligneDirecte}
+                  </TableCell>
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                  >
+                    {row.email}
+                  </TableCell>
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                    sx={{ maxWidth: "100px", overflow: "hidden" }}
+                  >
                     {row.reseauxSociaux}
                   </TableCell>
-                  <TableCell sx={{ textAlign: "center" }}>
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                    sx={{ textAlign: "center" }}
+                  >
                     {row.nbEtoile}
                   </TableCell>
-                  <TableCell>{row.nbFollowers}</TableCell>
-                  <TableCell>{row.siteWeb}</TableCell>
-                  <TableCell sx={{ ...statusStyle, cursor: "pointer",minWidth:'100px' }}>
-                   {row.statut}
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                  >
+                    {row.nbFollowers}
                   </TableCell>
-                  <TableCell sx={{ display: "flex" }}>
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                  >
+                    {row.siteWeb}
+                  </TableCell>
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                    sx={{
+                      ...statusStyle,
+                      cursor: "pointer",
+                      minWidth: "100px",
+                    }}
+                  >
+                    {row.statut}
+                  </TableCell>
+                  <TableCell sx={{ display: "flex", zIndex: 99 }}>
                     <Button
                       size="small"
                       variant="outlined"

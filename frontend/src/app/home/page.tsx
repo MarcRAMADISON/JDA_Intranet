@@ -13,57 +13,56 @@ import {
 import MenuBar from "../components/MenuBar/page";
 import CustomTable from "../components/Table/page";
 import { useCallback, useEffect, useState } from "react";
-import Cookies from "js-cookie";
 import AddFiche from "../components/AddFiche/page";
+import { getData, getUsers, handleExport } from "../utils";
+import { Download } from "@mui/icons-material";
+import Cookies from "js-cookie";
 
-async function getData({filter,start,limit}:{filter?: string,start?:number,limit?:number}) {
-  const token = Cookies.get("auth-token");
-  let rows;
+interface filterObject{
+  statut:string;
+  userId:number;
+}
 
-  if (filter) {
-    rows = await fetch(
-      `http://localhost:1337/api/fiches?filters[statut][$eq]=${filter}&pagination[start]=${start || 0}&pagination[limit]=${limit || 20}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-          accept: "application/json",
-          Authorization: "bearer " + token,
-        },
-      }
-    );
-  } else {
-    rows = await fetch(`http://localhost:1337/api/fiches?pagination[start]=${start || 0}&pagination[limit]=${limit || 20}`, {
-      method: "GET",
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
-        accept: "application/json",
-        Authorization: "bearer " + token,
-      },
-    });
-  }
-
-  return rows;
+const defaultFilter={
+  statut:'',
+  userId:0
 }
 
 function Home() {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [reload, setReload] = useState<boolean>(false);
   const [rows, setRows] = useState<any>([]);
-  const [statut, setStatut] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [userType, setUserType] = useState<"ADMIN" | "AGENT">("AGENT");
+  const [userList, setUserList] =
+    useState<{ id: number; username: string; type: string }[]>();
+  const [filters,setFilters]=useState<filterObject>(defaultFilter)
+  
 
   useEffect(() => {
-    getData({start:0,limit:20})
+    getData({ start: 20 * (currentPage - 1), limit: 20 })
       .then((res) => res.json())
       .then((res) => {
         const data = (res?.data || []).map((d) => ({
           id: d.id,
           ...d.attributes,
-          total:res?.meta?.pagination?.total || 0
+          total: res?.meta?.pagination?.total || 0,
         }));
         setRows(data);
       });
-  }, [reload]);
+
+    const user = Cookies.get("user");
+
+    if (user && JSON.parse(user).type === "ADMIN") {
+      setUserType("ADMIN");
+      getUsers()
+        .then((res) => res.json())
+        .then((res) => {
+          setUserList(res);
+        });
+    }
+  }, [reload, currentPage]);
+
 
   const handleOpenModal = useCallback(() => {
     setOpenModal(true);
@@ -71,51 +70,112 @@ function Home() {
 
   const handleChangeFilter = useCallback((event: any) => {
     event.preventDefault();
-    setStatut(event.target.value);
+
+    setFilters((prev)=>({...prev,[event.target.name]:event.target.value}))
+
+    console.log('filter',filters, event.target.name,event.target.value,{ filters:{...filters,[event.target.name]:event.target.value} })
+
     if (event.target.value === "TOUT") {
-      getData({start:0,limit:20})
+      getData({ start: 0, limit: 20 })
         .then((res) => res.json())
         .then((res) => {
           const data = (res?.data || []).map((d) => ({
             id: d.id,
             ...d.attributes,
-            total:res?.meta?.pagination?.total || 0
+            total: res?.meta?.pagination?.total || 0,
           }));
           setRows(data);
         });
     } else {
-      getData({filter:event.target.value})
+      getData({ filters:{...filters,[event.target.name]:event.target.value} })
         .then((res) => res.json())
         .then((res) => {
           const data = (res?.data || []).map((d) => ({
             id: d.id,
             ...d.attributes,
-            total:res?.meta?.pagination?.total || 0
+            total: res?.meta?.pagination?.total || 0,
           }));
           setRows(data);
         });
     }
-  }, []);
+  }, [filters]);
 
-  const handleChangePagination=useCallback((event:any,page:number)=>{
-    event.preventDefault()
-    getData({filter:statut,start:20 * (page - 1),limit:20})
+  const handleChangePagination = useCallback(
+    (event: any, page: number) => {
+      event.preventDefault();
+      getData({ filters, start: 20 * (page - 1), limit: 20 })
         .then((res) => res.json())
         .then((res) => {
           const data = (res?.data || []).map((d) => ({
             id: d.id,
             ...d.attributes,
-            total:res?.meta?.pagination?.total || 0
+            total: res?.meta?.pagination?.total || 0,
           }));
           setRows(data);
+          setCurrentPage(page);
         });
-  },[statut])
+    },
+    [filters]
+  );
+
+  const handleExportAction = useCallback(
+    (event: any) => {
+      event.preventDefault();
+      if (filters.statut) {
+        getData({ filters, isAll: true })
+          .then((res) => res.json())
+          .then((res) => {
+            const newData = (res.data || []).map((d) => ({
+              Responsable: d.attributes.responsable,
+              Localisation: d.attributes.localisation,
+              "Secteur activite": d.attributes.secteurActivite,
+              Etablissement: d.attributes.etablissement,
+              Email: d.attributes.email,
+              "Ligne directe": d.attributes.ligneDirecte,
+              "Telephone standard": d.attributes.telephoneStandard,
+              Statut: d.attributes.statut,
+              nbEtoile: d.attributes.nbEtoile,
+              "reseaux sociaux": d.attributes.reseauxSociaux,
+              nbFollowers: d.attributes.nbFollowers,
+              "Site web": d.attributes.siteWeb,
+            }));
+            handleExport(newData);
+          });
+      } else {
+        getData({ isAll: true })
+          .then((res) => res.json())
+          .then((res) => {
+            const newData = (res.data || []).map((d) => ({
+              Responsable: d.attributes.responsable,
+              Localisation: d.attributes.localisation,
+              "Secteur activite": d.attributes.secteurActivite,
+              Etablissement: d.attributes.etablissement,
+              Email: d.attributes.email,
+              "Ligne directe": d.attributes.ligneDirecte,
+              "Telephone standard": d.attributes.telephoneStandard,
+              Statut: d.attributes.statut,
+              nbEtoile: d.attributes.nbEtoile,
+              "reseaux sociaux": d.attributes.reseauxSociaux,
+              nbFollowers: d.attributes.nbFollowers,
+              "Site web": d.attributes.siteWeb,
+            }));
+            handleExport(newData);
+          });
+      }
+    },
+    [filters]
+  );
 
   return (
     <Box
-      sx={{ display: "flex", flexDirection: "column", alignItems: "center",mb:'100px' }}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        mb: "100px",
+      }}
     >
-      <MenuBar />
+      <MenuBar setReload={setReload} />
       <AddFiche
         openModal={openModal}
         setOpenModal={setOpenModal}
@@ -133,26 +193,25 @@ function Home() {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: "repeat(2,1fr)",
+            gridTemplateColumns: "repeat(4,1fr)",
             gap: "20px",
-            width: "500px",
             mb: "10px",
           }}
         >
           <Button variant="contained" onClick={handleOpenModal}>
             Nouvelle fiche
           </Button>
-          <FormControl fullWidth>
+          <FormControl sx={{ minWidth: "250px" }}>
             <InputLabel id="demo-simple-select-label">
               Filtrer par statut
             </InputLabel>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={statut}
+              value={filters.statut}
               name="statut"
               label="Type d'établissement"
-              onChange={handleChangeFilter}
+              onChange={(e)=>handleChangeFilter(e)}
               sx={{ width: "90%", mb: "10px" }}
             >
               <MenuItem value="TOUT">Afficher tout</MenuItem>
@@ -165,21 +224,61 @@ function Home() {
               <MenuItem value="Vente OK">Vente OK</MenuItem>
             </Select>
           </FormControl>
+          {userType === "ADMIN" && (
+            <FormControl sx={{ minWidth: "250px" }}>
+              <InputLabel id="demo-simple-select-label">
+                Filtrer par utilisateur
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={filters.userId}
+                name="userId"
+                label="Filtrer par utilisateur"
+                onChange={(e)=>handleChangeFilter(e)}
+                sx={{ width: "90%", mb: "10px" }}
+              >
+                <MenuItem value={0}>Afficher tout</MenuItem>
+                {(userList || []).map((user, key) => {
+                  return (
+                    <MenuItem key={key} value={user.id}>
+                      {user.username}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+          )}
+          <Button
+            sx={{ maxWidth: "120px" }}
+            startIcon={<Download />}
+            size="small"
+            onClick={handleExportAction}
+            variant="contained"
+          >
+            Exporter
+          </Button>
         </Box>
 
         <CustomTable rows={rows} setReload={setReload} />
         <Box
-        sx={{
-          width: "100%",
-          display: "flex",
-          flexDirection:"column",
-          justifyContent: "center",
-          alignItems:"center"
-        }}
-      >
-        <Pagination count={Math.ceil(rows[0]?.total/20)} color="primary" onChange={handleChangePagination}/>
-        <Typography variant="body1" sx={{mt:'30px'}}>Nombre total des fiches : {rows[0]?.total || 0}</Typography>
-      </Box>
+          sx={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Pagination
+            count={Math.ceil(rows[0]?.total / 20)}
+            color="primary"
+            onChange={handleChangePagination}
+          />
+          <Typography variant="body1" sx={{ mt: "30px" }}>
+            Nombre total des fiches : {rows[0]?.total || 0}
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );

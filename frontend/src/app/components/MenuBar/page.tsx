@@ -9,19 +9,23 @@ import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import Image from "next/image";
 import CustomModal from "../Modal/page";
 import { Alert, TextField } from "@mui/material";
-import { Check } from "@mui/icons-material";
+import { Check, MenuOpen, Person2 } from "@mui/icons-material";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import ExcelFileUploader from "@/app/ExcelFileUploader/page";
 
 const pages = ["Fiche"];
-const settings = ["Changer mot de passe", "Déconnecter"];
+const settings = [
+  "Importer un fichier excel",
+  "Changer mot de passe",
+  "Déconnecter",
+];
 
 interface changePwdType {
   newPassword: string;
@@ -29,15 +33,16 @@ interface changePwdType {
   currentPassword: string;
 }
 
-const defaultValues={
+const defaultValues = {
   newPassword: "",
   confirmPassword: "",
   currentPassword: "",
-}
+};
 
-function MenuBar() {
+function MenuBar({setReload}:{setReload:any}) {
   const [values, setValues] = React.useState<changePwdType>(defaultValues);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
+  const [openModalUpload, setOpenModalUpload] = React.useState<boolean>(false);
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
@@ -47,8 +52,17 @@ function MenuBar() {
   const [showError, setShowError] = React.useState<
     "ERROR" | "SUCCESS" | "HIDE" | "NOT_MATCH"
   >("HIDE");
+  const [userData, setUserData] = React.useState<any>();
+  const [disabled,setDisabled]= React.useState<boolean>(false)
 
   const route = useRouter();
+
+  React.useEffect(() => {
+    const data = Cookies.get("user");
+    const user = JSON.parse(data || "");
+
+    setUserData(user);
+  }, []);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -68,13 +82,17 @@ function MenuBar() {
   const handleMenuClick = (item: string) => {
     switch (item) {
       case "Changer mot de passe":
-        setValues(defaultValues)
+        setValues(defaultValues);
         setOpenModal(true);
         break;
       case "Déconnecter":
         Cookies.remove("auth-token");
+        Cookies.remove("user");
         route.push("/");
         break;
+        case "Importer un fichier excel":
+          setOpenModalUpload(true);
+          break;
       default:
         break;
     }
@@ -88,9 +106,8 @@ function MenuBar() {
   }, []);
 
   const handleValidate = React.useCallback(() => {
-
-    if(values.confirmPassword !== values.newPassword){
-      setShowError('NOT_MATCH')
+    if (values.confirmPassword !== values.newPassword) {
+      setShowError("NOT_MATCH");
       return;
     }
 
@@ -100,6 +117,8 @@ function MenuBar() {
       values.newPassword &&
       values.confirmPassword === values.newPassword
     ) {
+      setDisabled(true)
+
       const token = Cookies.get("auth-token");
 
       fetch("http://localhost:1337/api/auth/change-password", {
@@ -117,6 +136,7 @@ function MenuBar() {
       })
         .then((res) => res.json())
         .then((res) => {
+          setDisabled(false)
           if (res.jwt) {
             setShowError("SUCCESS");
           } else {
@@ -143,7 +163,11 @@ function MenuBar() {
             <Alert severity="success">Votre mot de passe a été modifié</Alert>
           ) : showError === "ERROR" ? (
             <Alert severity="error">Erreur lors de la modification</Alert>
-          ) : showError === 'NOT_MATCH'? (<Alert severity="error">La confirmation du mot de passe ne correspond pas</Alert>) : (
+          ) : showError === "NOT_MATCH" ? (
+            <Alert severity="error">
+              La confirmation du mot de passe ne correspond pas
+            </Alert>
+          ) : (
             <></>
           )}
           <TextField
@@ -177,9 +201,13 @@ function MenuBar() {
             startIcon={<Check />}
             variant="contained"
             onClick={handleValidate}
+            disabled={disabled || !values.confirmPassword || !values.currentPassword || !values.newPassword}
           >
             Modifier
           </Button>
+        </CustomModal>
+        <CustomModal upload setReload={setReload} open={openModalUpload} setOpen={setOpenModalUpload}>
+          <ExcelFileUploader />
         </CustomModal>
         <Toolbar disableGutters>
           <Box
@@ -261,8 +289,11 @@ function MenuBar() {
           </Box>
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Ouvrir le menu">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+              <IconButton
+                onClick={handleOpenUserMenu}
+                sx={{ p: 0, color: "#fff", width: "60px", height: "60px" }}
+              >
+                <MenuOpen />
               </IconButton>
             </Tooltip>
             <Menu
@@ -281,6 +312,14 @@ function MenuBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
+              <Box sx={{ display: "flex", alignItems: "center", mb: "10px" }}>
+                <IconButton>
+                  <Person2 />
+                </IconButton>
+                <Typography variant="body1">
+                  {userData?.username || ""}
+                </Typography>
+              </Box>
               {settings.map((setting) => (
                 <MenuItem
                   key={setting}

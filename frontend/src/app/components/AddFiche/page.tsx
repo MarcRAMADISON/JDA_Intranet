@@ -48,7 +48,7 @@ function AddFiche({
   setReload,
   openModal,
   setOpenModal,
-  row,
+  row = undefined,
 }: {
   setReload: any;
   openModal: boolean;
@@ -56,17 +56,29 @@ function AddFiche({
   row?: any;
 }) {
   const [values, setValues] = useState<ficheFormType>(defaultValues);
-  const [showMessage, setShowMessage] = useState<"HIDE" | "ERROR" | "SUCCESS">(
-    "HIDE"
-  );
+  const [showMessage, setShowMessage] = useState<
+    "HIDE" | "ERROR" | "SUCCESS" | "ALREADY_EXISTS"
+  >("HIDE");
 
   useEffect(() => {
     if (row) {
       setValues({
-        ...row,
+        responsable: row?.responsable || '',
+        localisation: row?.localisation || '',
+        secteurActivite: row?.secteurActivite || '',
+        etablissement: row?.etablissement || '',
+        email: row?.email || '',
+        ligneDirecte: row?.ligneDirecte || '',
+        statut: row?.statut || '',
+        telephoneStandard: row?.telephoneStandard || '',
+        nbEtoile: row?.nbEtoile || 0,
+        reseauxSociaux: row?.reseauxSociaux || '',
+        nbFollowers: row?.nbFollowers || 0,
+        siteWeb: row?.siteWeb || '',
       });
+      setShowMessage("HIDE")
     }
-  }, [row]);
+  }, [row, setValues]);
 
   const handleChange = useCallback((event: any) => {
     setValues((prev) => ({
@@ -84,6 +96,8 @@ function AddFiche({
       (values.telephoneStandard || values.ligneDirecte)
     ) {
       const token = Cookies.get("auth-token");
+      const user = Cookies.get("user");
+      const idUser = JSON.parse(user || "").id;
 
       if (row) {
         fetch(`http://localhost:1337/api/fiches/${row.id}`, {
@@ -116,7 +130,7 @@ function AddFiche({
               setValues(defaultValues);
               setShowMessage("SUCCESS");
               setReload((prev) => !prev);
-              setOpenModal(false)
+              setOpenModal(false);
             } else {
               setShowMessage("ERROR");
             }
@@ -126,7 +140,7 @@ function AddFiche({
         return;
       }
 
-      fetch("http://localhost:1337/api/fiches", {
+      fetch("http://localhost:3000/api/createFiche", {
         method: "POST",
         headers: {
           "Content-type": "application/json; charset=UTF-8",
@@ -134,22 +148,22 @@ function AddFiche({
           Authorization: "bearer " + token,
         },
         body: JSON.stringify({
-          data: {
-            ...values,
-          },
+          user: idUser,
+          ...values,
         }),
       })
         .then((res) => res.json())
         .then((res) => {
-          if (res.data) {
-            setValues(defaultValues);
-            setShowMessage("SUCCESS");
-            setReload((prev) => !prev);
-          } else {
+          if (res.type === "ALREADY_EXISTS") {
+            setShowMessage("ALREADY_EXISTS");
+          } else if (res.status === "500") {
             setShowMessage("ERROR");
+          } else {
+            setShowMessage("SUCCESS");
+            setValues(defaultValues);
+            setReload((prev) => !prev);
           }
-        })
-        .catch(() => setShowMessage("ERROR"));
+        });
     }
   };
 
@@ -166,13 +180,19 @@ function AddFiche({
         component="h1"
         color="primary"
       >
-        {row? "Modifier fiche" : "Nouvelle fiche"}
+        {row ? "Modifier fiche" : "Nouvelle fiche"}
       </Typography>
       {showMessage === "SUCCESS" ? (
-        <Alert severity="success" sx={{mb:'20px'}}>Fiche enregistrée</Alert>
+        <Alert severity="success" sx={{ mb: "20px" }}>
+          Fiche enregistrée
+        </Alert>
       ) : showMessage === "ERROR" ? (
-        <Alert severity="error" sx={{mb:'20px'}}>
+        <Alert severity="error" sx={{ mb: "20px" }}>
           Problème lors de l&apos;enregistrement du fiche
+        </Alert>
+      ) : showMessage === "ALREADY_EXISTS" ? (
+        <Alert severity="error" sx={{ mb: "20px" }}>
+          La fiche existe déjà dans la base de donnée
         </Alert>
       ) : (
         <></>
@@ -199,13 +219,13 @@ function AddFiche({
           name="etablissement"
           sx={{ width: "90%", mb: "10px" }}
           id="filled-basic"
-          label="Nom de l'établissement"
+          label="Nom de l'établissement *"
           variant="standard"
           onChange={handleChange}
         />
         <FormControl fullWidth>
           <InputLabel id="demo-simple-select-label">
-            Sécteur d&apos;activité
+            Sécteur d&apos;activité *
           </InputLabel>
           <Select
             labelId="demo-simple-select-label"
@@ -300,7 +320,7 @@ function AddFiche({
           onChange={handleChange}
         />
         <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Statut</InputLabel>
+          <InputLabel id="demo-simple-select-label">Statut *</InputLabel>
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
