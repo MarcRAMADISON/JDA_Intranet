@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "entreprises",
+  "info": {
+    "singularName": "entreprise",
+    "pluralName": "entreprises",
+    "displayName": "entreprise"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nom": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "equipe": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::equipe.equipe",
+      "inversedBy": "entreprises"
+    }
+  }
+}

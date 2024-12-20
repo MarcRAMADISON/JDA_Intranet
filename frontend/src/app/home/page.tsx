@@ -55,6 +55,7 @@ function Home() {
 
     if (user && JSON.parse(user).type === "ADMIN") {
       setUserType("ADMIN");
+
       getUsers()
         .then((res) => res.json())
         .then((res) => {
@@ -73,7 +74,6 @@ function Home() {
 
     setFilters((prev)=>({...prev,[event.target.name]:event.target.value}))
 
-    console.log('filter',filters, event.target.name,event.target.value,{ filters:{...filters,[event.target.name]:event.target.value} })
 
     if (event.target.value === "TOUT") {
       getData({ start: 0, limit: 20 })

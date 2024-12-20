@@ -4,9 +4,11 @@ import * as XLSX from "xlsx";
 export const setAuthCookie = ({
   cookies,
   user,
+  idEquipe
 }: {
   cookies: string;
   user: string;
+  idEquipe: string
 }) => {
   Cookies.set("auth-token", cookies, {
     expires: 1, // Durée en jours
@@ -15,6 +17,12 @@ export const setAuthCookie = ({
     sameSite: "strict",
   });
   Cookies.set("user", user, {
+    expires: 1, // Durée en jours
+    path: "/",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+  Cookies.set("idEquipe", idEquipe, {
     expires: 1, // Durée en jours
     path: "/",
     secure: process.env.NODE_ENV === "production",
@@ -91,17 +99,16 @@ export async function getData({
 }) {
   const token = Cookies.get("auth-token");
   const user = Cookies.get("user");
+  const idEquipe = Cookies.get("idEquipe");
   const type = JSON.parse(user || "").type;
   const idUser = JSON.parse(user || "").id;
-  const query = (type === "ADMIN" && filters?.userId === 0) || (type === "ADMIN" && !filters?.userId) ? "?" : type === "ADMIN" && filters?.userId !== 0
+  const query = (type === "ADMIN" && filters?.userId === 0) || (type === "ADMIN" && !filters?.userId) ? `?filters[user][equipe][$eq]=${idEquipe}&` : type === "ADMIN" && filters?.userId !== 0
         ? `?filters[user][$eq]=${filters?.userId}&`
       : `?filters[user][$eq]=${idUser}&`;
 
-  console.log('filters 2',type,filters?.userId,idUser,isAll)
 
   let rows;
 
-  console.log("filter", filters);
 
   if (filters?.statut && filters?.statut !== 'TOUT' && !isAll) {
     rows = await fetch(
@@ -164,16 +171,18 @@ export async function getData({
 
 export const getUsers = async () => {
   const token = Cookies.get("auth-token");
-
-  return fetch(
-    `http://localhost:1337/api/users?fields[0]=username&fields[1]=type`,
-    {
-      method: "GET",
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
-        accept: "application/json",
-        Authorization: "bearer " + token,
-      },
-    }
-  );
+  const idEquipe = Cookies.get("idEquipe");
+  
+    return fetch(
+      `http://localhost:1337/api/users?filters[equipe]=${idEquipe}&fields[0]=username&fields[1]=type`,
+      {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+          accept: "application/json",
+          Authorization: "bearer " + token,
+        },
+      }
+    );
+ 
 };

@@ -362,6 +362,84 @@ export interface AdminUser extends Schema.CollectionType {
   };
 }
 
+export interface ApiEntrepriseEntreprise extends Schema.CollectionType {
+  collectionName: 'entreprises';
+  info: {
+    displayName: 'entreprise';
+    pluralName: 'entreprises';
+    singularName: 'entreprise';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::entreprise.entreprise',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    description: Attribute.String;
+    equipe: Attribute.Relation<
+      'api::entreprise.entreprise',
+      'manyToOne',
+      'api::equipe.equipe'
+    >;
+    nom: Attribute.String;
+    publishedAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    updatedBy: Attribute.Relation<
+      'api::entreprise.entreprise',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiEquipeEquipe extends Schema.CollectionType {
+  collectionName: 'equipes';
+  info: {
+    description: '';
+    displayName: 'equipe';
+    pluralName: 'equipes';
+    singularName: 'equipe';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::equipe.equipe',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    description: Attribute.Text;
+    entreprises: Attribute.Relation<
+      'api::equipe.equipe',
+      'oneToMany',
+      'api::entreprise.entreprise'
+    >;
+    nom: Attribute.String;
+    publishedAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    updatedBy: Attribute.Relation<
+      'api::equipe.equipe',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    users_permissions_users: Attribute.Relation<
+      'api::equipe.equipe',
+      'oneToMany',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
 export interface ApiFicheFiche extends Schema.CollectionType {
   collectionName: 'fiches';
   info: {
@@ -806,6 +884,11 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
+    equipe: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'manyToOne',
+      'api::equipe.equipe'
+    >;
     fiches: Attribute.Relation<
       'plugin::users-permissions.user',
       'oneToMany',
@@ -852,6 +935,8 @@ declare module '@strapi/types' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::entreprise.entreprise': ApiEntrepriseEntreprise;
+      'api::equipe.equipe': ApiEquipeEquipe;
       'api::fiche.fiche': ApiFicheFiche;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

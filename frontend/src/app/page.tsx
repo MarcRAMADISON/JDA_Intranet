@@ -20,17 +20,17 @@ interface loginType {
 }
 
 export default function Login() {
-  const route=useRouter();
+  const route = useRouter();
   const [values, setValues] = useState<loginType>({
     identifier: "",
     password: "",
   });
-  const [showError,setShowError]=useState<boolean>(false);
-  const [disabled,setDisabled]=useState<boolean>(false);
+  const [showError, setShowError] = useState<boolean>(false);
+  const [disabled, setDisabled] = useState<boolean>(false);
 
   const handleConnect = useCallback(() => {
     if (values.identifier && values.password) {
-      setDisabled(true)
+      setDisabled(true);
 
       fetch("http://localhost:1337/api/auth/local", {
         method: "POST",
@@ -42,21 +42,38 @@ export default function Login() {
           identifier: values.identifier,
           password: values.password,
         }),
-      }).then((res)=>res.json()).then((res)=>{
-        setDisabled(false)
-        if(res.status === 200 || res?.jwt){
-          setAuthCookie({cookies:res?.jwt,user:JSON.stringify(res?.user)})
-          route.push('/home')
-        }else{
-          setShowError(true)
-        }
-
-      }).catch(()=>{
-        setDisabled(false)
-        setShowError(true)
-      });
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          setDisabled(false);
+          if (res.status === 200 || res?.jwt) {
+            return fetch("http://localhost:1337/api/users/me?populate=equipe", {
+              method: "GET",
+              headers: {
+                Authorization: "Bearer " + res?.jwt,
+              },
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                const idEquipe = data?.equipe?.id;
+                setAuthCookie({
+                  cookies: res?.jwt,
+                  user: JSON.stringify(res?.user),
+                  idEquipe: idEquipe,
+                });
+                route.push("/home");
+              })
+              .catch((error) => console.error("Erreur :", error));
+          } else {
+            setShowError(true);
+          }
+        })
+        .catch(() => {
+          setDisabled(false);
+          setShowError(true);
+        });
     }
-  }, [values,route]);
+  }, [values, route]);
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -81,7 +98,9 @@ export default function Login() {
       }}
     >
       <Paper sx={paperStyle}>
-        {showError && <Alert severity="error" >Mot de passe ou login invalides</Alert>}
+        {showError && (
+          <Alert severity="error">Mot de passe ou login invalides</Alert>
+        )}
         <Box sx={{ width: "90%", height: "100px", position: "relative" }}>
           <Image
             src="/assets/logo-removebg-preview.png"
@@ -116,7 +135,7 @@ export default function Login() {
           />
         </Box>
         <Button
-          disabled={!values.identifier || !values.password || disabled }
+          disabled={!values.identifier || !values.password || disabled}
           sx={{ width: "50%", placeSelf: "center", marginTop: "30px" }}
           onClick={handleConnect}
           variant="contained"

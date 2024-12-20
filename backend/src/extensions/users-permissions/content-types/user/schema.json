@@ -79,6 +79,12 @@
       "relation": "oneToMany",
       "target": "api::fiche.fiche",
       "mappedBy": "user"
+    },
+    "equipe": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::equipe.equipe",
+      "inversedBy": "users_permissions_users"
     }
   }
 }
