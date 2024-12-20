@@ -469,6 +469,7 @@ export interface ApiFicheFiche extends Schema.CollectionType {
     reseauxSociaux: Attribute.String;
     responsable: Attribute.String;
     secteurActivite: Attribute.String;
+    siren: Attribute.BigInteger;
     siteWeb: Attribute.String;
     statut: Attribute.String;
     telephoneStandard: Attribute.String;
@@ -480,6 +481,11 @@ export interface ApiFicheFiche extends Schema.CollectionType {
     > &
       Attribute.Private;
     user: Attribute.Relation<
+      'api::fiche.fiche',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    venduePar: Attribute.Relation<
       'api::fiche.fiche',
       'manyToOne',
       'plugin::users-permissions.user'
@@ -890,6 +896,11 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'api::equipe.equipe'
     >;
     fiches: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::fiche.fiche'
+    >;
+    ficheVendue: Attribute.Relation<
       'plugin::users-permissions.user',
       'oneToMany',
       'api::fiche.fiche'

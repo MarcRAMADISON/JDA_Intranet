@@ -116,7 +116,7 @@ export async function getData({
         filters.statut
       }&pagination[start]=${start || 0}&pagination[limit]=${
         limit || 20
-      }&populate=user`,
+      }&populate=user,venduePar`,
       {
         method: "GET",
         headers: {
@@ -128,7 +128,7 @@ export async function getData({
     );
   } else if (isAll && (!filters?.statut || filters?.statut === "TOUT")) {
     rows = await fetch(
-      `http://localhost:1337/api/fiches${query}populate=user&pagination[limit]=999`,
+      `http://localhost:1337/api/fiches${query}populate=user,venduePar&pagination[limit]=999`,
       {
         method: "GET",
         headers: {
@@ -140,7 +140,7 @@ export async function getData({
     );
   } else if (isAll && filters?.statut) {
     rows = await fetch(
-      `http://localhost:1337/api/fiches${query}filters[statut][$eq]=${filters?.statut}&populate=user&pagination[limit]=999`,
+      `http://localhost:1337/api/fiches${query}filters[statut][$eq]=${filters?.statut}&populate=user,venduePar&pagination[limit]=999`,
       {
         method: "GET",
         headers: {
@@ -154,7 +154,7 @@ export async function getData({
     rows = await fetch(
       `http://localhost:1337/api/fiches${query}pagination[start]=${
         start || 0
-      }&pagination[limit]=${limit || 20}&populate=user`,
+      }&pagination[limit]=${limit || 20}&populate=user,venduePar`,
       {
         method: "GET",
         headers: {

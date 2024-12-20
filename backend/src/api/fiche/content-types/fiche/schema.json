@@ -53,6 +53,15 @@
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
       "inversedBy": "fiches"
+    },
+    "siren": {
+      "type": "biginteger"
+    },
+    "venduePar": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "ficheVendue"
     }
   }
 }

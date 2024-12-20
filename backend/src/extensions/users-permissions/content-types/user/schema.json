@@ -85,6 +85,12 @@
       "relation": "manyToOne",
       "target": "api::equipe.equipe",
       "inversedBy": "users_permissions_users"
+    },
+    "ficheVendue": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::fiche.fiche",
+      "mappedBy": "venduePar"
     }
   }
 }

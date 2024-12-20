@@ -27,6 +27,7 @@ interface ficheFormType {
   reseauxSociaux: string;
   nbFollowers: number;
   siteWeb: string;
+  siren:number;
 }
 
 const defaultValues = {
@@ -42,6 +43,7 @@ const defaultValues = {
   reseauxSociaux: "",
   nbFollowers: 0,
   siteWeb: "",
+  siren:0
 };
 
 function AddFiche({
@@ -75,6 +77,7 @@ function AddFiche({
         reseauxSociaux: row?.reseauxSociaux || '',
         nbFollowers: row?.nbFollowers || 0,
         siteWeb: row?.siteWeb || '',
+        siren: row?.siren || 0
       });
       setShowMessage("HIDE")
     }
@@ -121,6 +124,8 @@ function AddFiche({
               reseauxSociaux: values.reseauxSociaux,
               nbFollowers: values.nbFollowers,
               siteWeb: values.siteWeb,
+              siren: values.statut === 'Vente OK' ? values.siren : 0,
+              venduePar: values.statut === 'Vente OK' ? idUser : null,
             },
           }),
         })
@@ -149,6 +154,7 @@ function AddFiche({
         },
         body: JSON.stringify({
           user: idUser,
+          venduePar: values.statut === 'Vente OK' ? idUser : null,
           ...values,
         }),
       })
@@ -339,7 +345,17 @@ function AddFiche({
             <MenuItem value="Vente OK">Vente OK</MenuItem>={" "}
           </Select>
         </FormControl>
+        { values.statut === 'Vente OK' && <TextField
+          value={values.siren}
+          name="siren"
+          sx={{ width: "90%", mb: "10px" }}
+          id="filled-basic"
+          label="Siren"
+          variant="standard"
+          onChange={handleChange}
+        />}
       </Box>
+      
 
       <Button
         sx={{ mt: "30px" }}

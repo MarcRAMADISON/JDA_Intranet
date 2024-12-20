@@ -105,6 +105,16 @@ export default function CustomTable({
                   minWidth: "150px",
                 }}
               >
+                Vendue par
+              </TableCell>
+              <TableCell
+                style={{
+                  fontSize: "0.9rem",
+                  color: "#fff",
+                  fontWeight: "bold",
+                  minWidth: "150px",
+                }}
+              >
                 Responsable
               </TableCell>
               <TableCell
@@ -215,6 +225,16 @@ export default function CustomTable({
                   minWidth: "150px",
                 }}
               >
+                Siren
+              </TableCell>
+              <TableCell
+                style={{
+                  fontSize: "0.9rem",
+                  color: "#fff",
+                  fontWeight: "bold",
+                  minWidth: "150px",
+                }}
+              >
                 Statut
               </TableCell>
             </TableRow>
@@ -228,6 +248,9 @@ export default function CustomTable({
                     row.statut === "Ne plus appeler"
                   ? { backgroundColor: "#ff3c33", color: "#fff" }
                   : { backgroundColor: "#1976d2", color: "#fff" };
+
+              const user = Cookies.get("user");
+              const type = JSON.parse(user || "").type;
 
               return (
                 <TableRow
@@ -257,6 +280,14 @@ export default function CustomTable({
                     }}
                   >
                     {row.user.data.attributes.username}
+                  </TableCell>
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                  >
+                    {row?.venduePar?.data?.attributes?.username || ""}
                   </TableCell>
                   <TableCell
                     onClick={() => {
@@ -354,6 +385,18 @@ export default function CustomTable({
                       setOpenUpdateModal(true);
                     }}
                     sx={{
+                      cursor: "pointer",
+                      minWidth: "100px",
+                    }}
+                  >
+                    {row.siren}
+                  </TableCell>
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                    sx={{
                       ...statusStyle,
                       cursor: "pointer",
                       minWidth: "100px",
@@ -372,15 +415,17 @@ export default function CustomTable({
                     >
                       <Edit />
                     </Button>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      color="error"
-                      sx={{ ml: "10px" }}
-                      onClick={() => handleConfirm(row)}
-                    >
-                      <Delete />
-                    </Button>
+                    {type === "ADMIN" && (
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        color="error"
+                        sx={{ ml: "10px" }}
+                        onClick={() => handleConfirm(row)}
+                      >
+                        <Delete />
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               );
