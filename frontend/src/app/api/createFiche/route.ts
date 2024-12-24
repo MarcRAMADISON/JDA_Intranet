@@ -3,15 +3,21 @@ import { NextRequest } from "next/server";
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
+
   if (body?.telephoneStandard || body?.ligneDirecte) {
+
+    
+  const telephoneStandard=encodeURIComponent(body?.telephoneStandard)
+  const ligneDirecte=encodeURIComponent(body?.ligneDirecte)
+
     return fetch(
       `http://localhost:1337/api/fiches?filters[$or][0][telephoneStandard][$eq]=${
-        body?.telephoneStandard || null
+        telephoneStandard || null
       }&filters[$or][1][ligneDirecte][$eq]=${
-        body?.ligneDirecte || null
+        ligneDirecte || null
       }&filters[$or][2][ligneDirecte][$eq]=${
-        body?.telephoneStandard || null
-      }&filters[$or][3][telephoneStandard][$eq]=${body?.ligneDirecte || null}`,
+        telephoneStandard || null
+      }&filters[$or][3][telephoneStandard][$eq]=${ligneDirecte || null}`,
       {
         method: "GET",
         headers: {
@@ -23,6 +29,7 @@ export async function POST(request: NextRequest) {
     )
       .then((res) => res.json())
       .then((res) => {
+        console.log('res',res)
         if (res?.data?.length) {
           return new Response(
             JSON.stringify({
