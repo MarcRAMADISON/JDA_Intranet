@@ -342,6 +342,7 @@ function AddFiche({
             onChange={handleChange}
             sx={{ width: "90%", mb: "10px" }}
           >
+            <MenuItem value="Nouveau">Nouveau</MenuItem>
             <MenuItem value="Injoignable">Injoignable</MenuItem>
             <MenuItem value="Ne répond pas">Ne répond pas</MenuItem>
             <MenuItem value="A rappeler">A rappeler</MenuItem>
