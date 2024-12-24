@@ -1,6 +1,6 @@
 FROM node:18
 # Installing libvips-dev for sharp Compatability
-RUN apt-get update && apt-get install libvips-dev -y
+RUN apt-get update && apt-get install libvips-dev vim -y
 
 # where our Strapi app will live
 RUN mkdir -p /app
@@ -23,11 +23,8 @@ COPY ./backend /app
 
 EXPOSE 1337
 
-# For production build
-ENV NODE_ENV=${NODE_ENV}
-
 # Build Strapi admin
 RUN yarn build
 
 # Run yarn dev, as we would via the command line 
-CMD ["yarn", "start"]
+CMD ["yarn", "develop"]

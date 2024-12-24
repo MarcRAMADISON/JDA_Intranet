@@ -43,7 +43,7 @@ function Home() {
     getData({ start: 20 * (currentPage - 1), limit: 20 })
       .then((res) => res.json())
       .then((res) => {
-        const data = (res?.data || []).map((d) => ({
+        const data = (res?.data || []).map((d:any) => ({
           id: d.id,
           ...d.attributes,
           total: res?.meta?.pagination?.total || 0,
@@ -79,7 +79,7 @@ function Home() {
       getData({ start: 0, limit: 20 })
         .then((res) => res.json())
         .then((res) => {
-          const data = (res?.data || []).map((d) => ({
+          const data = (res?.data || []).map((d:any) => ({
             id: d.id,
             ...d.attributes,
             total: res?.meta?.pagination?.total || 0,
@@ -90,7 +90,7 @@ function Home() {
       getData({ filters:{...filters,[event.target.name]:event.target.value} })
         .then((res) => res.json())
         .then((res) => {
-          const data = (res?.data || []).map((d) => ({
+          const data = (res?.data || []).map((d:any) => ({
             id: d.id,
             ...d.attributes,
             total: res?.meta?.pagination?.total || 0,
@@ -106,7 +106,7 @@ function Home() {
       getData({ filters, start: 20 * (page - 1), limit: 20 })
         .then((res) => res.json())
         .then((res) => {
-          const data = (res?.data || []).map((d) => ({
+          const data = (res?.data || []).map((d:any) => ({
             id: d.id,
             ...d.attributes,
             total: res?.meta?.pagination?.total || 0,
@@ -125,7 +125,7 @@ function Home() {
         getData({ filters, isAll: true })
           .then((res) => res.json())
           .then((res) => {
-            const newData = (res.data || []).map((d) => ({
+            const newData = (res.data || []).map((d:any) => ({
               Responsable: d.attributes.responsable,
               Localisation: d.attributes.localisation,
               "Secteur activite": d.attributes.secteurActivite,
@@ -145,7 +145,7 @@ function Home() {
         getData({ isAll: true })
           .then((res) => res.json())
           .then((res) => {
-            const newData = (res.data || []).map((d) => ({
+            const newData = (res.data || []).map((d:any) => ({
               Responsable: d.attributes.responsable,
               Localisation: d.attributes.localisation,
               "Secteur activite": d.attributes.secteurActivite,

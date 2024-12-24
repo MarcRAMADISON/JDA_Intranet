@@ -22,12 +22,9 @@ import moment from "moment";
 export default function CustomTable({
   rows,
   setReload,
-}: {
-  rows: any;
-  setReload: any;
-}) {
+}: any) {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
-  const [currentRow, setCurrentRow] = React.useState<any>();
+  const [currentRow, setCurrentRow] = React.useState<any>({});
   const [openUpdateModal, setOpenUpdateModal] = React.useState<boolean>(false);
 
   const handleDelete = React.useCallback(
@@ -43,13 +40,13 @@ export default function CustomTable({
         },
       });
 
-      setReload((prev) => !prev);
+      setReload((prev:any) => !prev);
       setOpenModal(false);
     },
     [setReload, currentRow?.id]
   );
 
-  const handleConfirm = React.useCallback((row) => {
+  const handleConfirm = React.useCallback((row:any) => {
     setOpenModal(true);
     setCurrentRow(row);
   }, []);
@@ -240,7 +237,7 @@ export default function CustomTable({
             </TableRow>
           </TableHead>
           <TableBody>
-            {(rows || []).map((row, index) => {
+            {(rows || []).map((row:any, index:number) => {
               const statusStyle =
                 row.statut === "Vente OK"
                   ? { backgroundColor: "green", color: "#fff" }

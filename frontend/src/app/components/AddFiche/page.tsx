@@ -1,3 +1,5 @@
+  "use client";
+
 import {
   Alert,
   Box,
@@ -15,6 +17,7 @@ import Cookies from "js-cookie";
 import { Check } from "@mui/icons-material";
 
 interface ficheFormType {
+  id?:number;
   responsable: string;
   localisation: string;
   secteurActivite: string;
@@ -46,17 +49,20 @@ const defaultValues = {
   siren:0
 };
 
+/*interface AddFicheProps {
+  row?: ficheFormType;
+  setReload: (value: boolean | ((prev: boolean) => boolean)) => void;
+  openModal: boolean;
+  setOpenModal: (value: boolean) => void;
+}*/
+
 function AddFiche({
   setReload,
   openModal,
   setOpenModal,
-  row = undefined,
-}: {
-  setReload: any;
-  openModal: boolean;
-  setOpenModal: any;
-  row?: any;
-}) {
+  row,
+}: any
+) {
   const [values, setValues] = useState<ficheFormType>(defaultValues);
   const [showMessage, setShowMessage] = useState<
     "HIDE" | "ERROR" | "SUCCESS" | "ALREADY_EXISTS"
@@ -134,7 +140,7 @@ function AddFiche({
             if (res.data) {
               setValues(defaultValues);
               setShowMessage("SUCCESS");
-              setReload((prev) => !prev);
+              setReload((prev:any) => !prev);
               setOpenModal(false);
             } else {
               setShowMessage("ERROR");
@@ -167,7 +173,7 @@ function AddFiche({
           } else {
             setShowMessage("SUCCESS");
             setValues(defaultValues);
-            setReload((prev) => !prev);
+            setReload((prev:any) => !prev);
           }
         });
     }

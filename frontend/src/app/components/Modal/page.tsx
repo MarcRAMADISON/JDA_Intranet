@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
@@ -24,14 +26,7 @@ export default function CustomModal({
   style,
   setReload,
   upload = false,
-}: {
-  open: boolean;
-  setOpen: any;
-  children: any;
-  style?: any;
-  setReload?: any;
-  upload?: boolean;
-}) {
+}:any) {
   const handleClose = () => {
     setOpen(false);
     if (upload && setReload) {

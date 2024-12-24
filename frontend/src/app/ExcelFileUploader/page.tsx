@@ -1,3 +1,5 @@
+"use client";
+
 import { Box, Button, Typography } from "@mui/material";
 import React, { useState } from "react";
 import * as XLSX from "xlsx";

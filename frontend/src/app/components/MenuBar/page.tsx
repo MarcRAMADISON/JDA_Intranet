@@ -39,7 +39,7 @@ const defaultValues = {
   currentPassword: "",
 };
 
-function MenuBar({setReload}:{setReload:any}) {
+function MenuBar({setReload}:any) {
   const [values, setValues] = React.useState<changePwdType>(defaultValues);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [openModalUpload, setOpenModalUpload] = React.useState<boolean>(false);
