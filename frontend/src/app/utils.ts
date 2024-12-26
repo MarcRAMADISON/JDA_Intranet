@@ -103,8 +103,8 @@ export async function getData({
   const type = JSON.parse(user || "").type;
   const idUser = JSON.parse(user || "").id;
   const query = (type === "ADMIN" && filters?.userId === 0) || (type === "ADMIN" && !filters?.userId) ? `?filters[user][equipe][$eq]=${idEquipe}&` : type === "ADMIN" && filters?.userId !== 0
-        ? `?filters[user][$eq]=${filters?.userId}&`
-      : `?filters[user][$eq]=${idUser}&`;
+        ? `?filters[$or][0][user][$eq]=${filters?.userId}&filters[$or][1][userAssigne][$eq]=${filters?.userId}&`
+      : `?filters[$or][0][user][$eq]=${idUser}&filters[$or][1][userAssigne][$eq]=${idUser}&`;
 
 
   let rows;
@@ -116,7 +116,7 @@ export async function getData({
         filters.statut
       }&pagination[start]=${start || 0}&pagination[limit]=${
         limit || 20
-      }&populate=user,venduePar`,
+      }&populate=user,venduePar,userAssigne`,
       {
         method: "GET",
         headers: {
@@ -128,7 +128,7 @@ export async function getData({
     );
   } else if (isAll && (!filters?.statut || filters?.statut === "TOUT")) {
     rows = await fetch(
-      `http://localhost:1337/api/fiches${query}populate=user,venduePar&pagination[limit]=999`,
+      `http://localhost:1337/api/fiches${query}populate=user,venduePar,userAssigne&pagination[limit]=999`,
       {
         method: "GET",
         headers: {
@@ -140,7 +140,7 @@ export async function getData({
     );
   } else if (isAll && filters?.statut) {
     rows = await fetch(
-      `http://localhost:1337/api/fiches${query}filters[statut][$eq]=${filters?.statut}&populate=user,venduePar&pagination[limit]=999`,
+      `http://localhost:1337/api/fiches${query}filters[statut][$eq]=${filters?.statut}&populate=user,venduePar,userAssigne&pagination[limit]=999`,
       {
         method: "GET",
         headers: {
@@ -154,7 +154,7 @@ export async function getData({
     rows = await fetch(
       `http://localhost:1337/api/fiches${query}pagination[start]=${
         start || 0
-      }&pagination[limit]=${limit || 20}&populate=user,venduePar`,
+      }&pagination[limit]=${limit || 20}&populate=user,venduePar,userAssigne`,
       {
         method: "GET",
         headers: {

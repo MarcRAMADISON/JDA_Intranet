@@ -91,6 +91,12 @@
       "relation": "oneToMany",
       "target": "api::fiche.fiche",
       "mappedBy": "venduePar"
+    },
+    "fichesAssigne": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::fiche.fiche",
+      "mappedBy": "userAssigne"
     }
   }
 }

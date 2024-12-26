@@ -52,16 +52,18 @@ function Home() {
       });
 
     const user = Cookies.get("user");
+    const dataUser=user && JSON.parse(user)
 
-    if (user && JSON.parse(user).type === "ADMIN") {
+    if (dataUser?.type === 'ADMIN') {
       setUserType("ADMIN");
-
-      getUsers()
-        .then((res) => res.json())
-        .then((res) => {
-          setUserList(res);
-        });
     }
+
+    getUsers()
+    .then((res) => res.json())
+    .then((res) => {
+      
+      setUserList(res.filter((r:any)=>r.id !== dataUser?.id));
+    });
   }, [reload, currentPage]);
 
 
@@ -261,7 +263,7 @@ function Home() {
           </Button>
         </Box>
 
-        <CustomTable rows={rows} setReload={setReload} />
+        <CustomTable rows={rows} setReload={setReload} userList={userList} />
         <Box
           sx={{
             width: "100%",

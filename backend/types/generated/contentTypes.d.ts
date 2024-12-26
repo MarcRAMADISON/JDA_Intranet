@@ -485,6 +485,11 @@ export interface ApiFicheFiche extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
+    userAssigne: Attribute.Relation<
+      'api::fiche.fiche',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
     venduePar: Attribute.Relation<
       'api::fiche.fiche',
       'manyToOne',
@@ -896,6 +901,11 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'api::equipe.equipe'
     >;
     fiches: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::fiche.fiche'
+    >;
+    fichesAssigne: Attribute.Relation<
       'plugin::users-permissions.user',
       'oneToMany',
       'api::fiche.fiche'

@@ -5,6 +5,11 @@ import Paper from "@mui/material/Paper";
 import {
   Box,
   Button,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
   Table,
   TableBody,
   TableCell,
@@ -13,19 +18,18 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { Delete, Edit } from "@mui/icons-material";
+import { Delete, Edit, Share } from "@mui/icons-material";
 import Cookies from "js-cookie";
 import CustomModal from "../Modal/page";
 import AddFiche from "../AddFiche/page";
 import moment from "moment";
 
-export default function CustomTable({
-  rows,
-  setReload,
-}: any) {
+export default function CustomTable({ rows, setReload, userList }: any) {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [currentRow, setCurrentRow] = React.useState<any>({});
   const [openUpdateModal, setOpenUpdateModal] = React.useState<boolean>(false);
+  const [openAssign, setOpenAssign] = React.useState<boolean>(false);
+  const [selectedUser,setSelectedUser]= React.useState<number>(0);
 
   const handleDelete = React.useCallback(
     (event: any) => {
@@ -40,16 +44,48 @@ export default function CustomTable({
         },
       });
 
-      setReload((prev:any) => !prev);
+      setReload((prev: any) => !prev);
       setOpenModal(false);
     },
     [setReload, currentRow?.id]
   );
 
-  const handleConfirm = React.useCallback((row:any) => {
+  const handleConfirm = React.useCallback((row: any) => {
     setOpenModal(true);
     setCurrentRow(row);
   }, []);
+
+  const handleChange=(e:any)=>{
+    e.preventDefault();
+    setSelectedUser(e.target.value)
+  }
+
+  const handleAssign = React.useCallback(() => {
+
+
+    if(currentRow && selectedUser){
+      const token = Cookies.get("auth-token");
+
+      fetch(`http://localhost:1337/api/fiches/${currentRow.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+          accept: "application/json",
+          Authorization: "bearer " + token,
+        },
+        body: JSON.stringify({
+          data: {
+            userAssigne: selectedUser
+          },
+        }),
+      })
+
+      setReload((prev: any) => !prev);
+      setOpenAssign(false);
+    }
+
+   
+  }, [currentRow,selectedUser,setReload,setOpenAssign]);
 
   return (
     <Box sx={{ height: "100%", width: "100%", mt: "50px", mb: "50px" }}>
@@ -60,6 +96,41 @@ export default function CustomTable({
           color="error"
           sx={{ mt: "30px" }}
           onClick={handleDelete}
+        >
+          Confirmer
+        </Button>
+      </CustomModal>
+      <CustomModal open={openAssign} setOpen={setOpenAssign}>
+        <Typography variant="body1" sx={{textAlign:'center',mb:"30px"}}>Assigner la fiche à une autre personne de votre groupe</Typography>
+        <FormControl>
+          <FormLabel id="demo-radio-buttons-group-label">
+          </FormLabel>
+          <RadioGroup
+            aria-labelledby="demo-radio-buttons-group-label"
+            defaultValue="female"
+            name="radio-buttons-group"
+            sx={{display:'grid',gridTemplateColumns:'repeat(2,1fr)'}}
+            onChange={handleChange}
+            value={selectedUser}
+          >
+            {(userList || []).map((user: any, index: number) => {
+              return (
+                <FormControlLabel
+                  value={user.id}
+                  control={<Radio />}
+                  label={user.username}
+                  key={index}
+                />
+              );
+            })}
+          </RadioGroup>
+        </FormControl>
+
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{ mt: "30px" }}
+          onClick={()=>handleAssign()}
         >
           Confirmer
         </Button>
@@ -103,6 +174,16 @@ export default function CustomTable({
                 }}
               >
                 Vendue par
+              </TableCell>
+              <TableCell
+                style={{
+                  fontSize: "0.9rem",
+                  color: "#fff",
+                  fontWeight: "bold",
+                  minWidth: "150px",
+                }}
+              >
+                Assignée à
               </TableCell>
               <TableCell
                 style={{
@@ -237,7 +318,7 @@ export default function CustomTable({
             </TableRow>
           </TableHead>
           <TableBody>
-            {(rows || []).map((row:any, index:number) => {
+            {(rows || []).map((row: any, index: number) => {
               const statusStyle =
                 row.statut === "Vente OK"
                   ? { backgroundColor: "green", color: "#fff" }
@@ -285,6 +366,14 @@ export default function CustomTable({
                     }}
                   >
                     {row?.venduePar?.data?.attributes?.username || ""}
+                  </TableCell>
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                  >
+                    {row?.userAssigne?.data?.attributes?.username || ""}
                   </TableCell>
                   <TableCell
                     onClick={() => {
@@ -412,6 +501,18 @@ export default function CustomTable({
                     >
                       <Edit />
                     </Button>
+                    {(!row?.userAssigne?.data || JSON.parse(user || "").id === row?.user?.data?.id || JSON.parse(user || "").id !== row?.userAssigne?.data?.id ) && <Button
+                      size="small"
+                      variant="outlined"
+                      color="primary"
+                      sx={{ ml: "10px" }}
+                      onClick={() => {
+                        setCurrentRow(row);
+                        setOpenAssign(true);
+                      }}
+                    >
+                      <Share />
+                    </Button>}
                     {type === "ADMIN" && (
                       <Button
                         size="small"
