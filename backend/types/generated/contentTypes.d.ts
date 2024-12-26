@@ -464,7 +464,7 @@ export interface ApiFicheFiche extends Schema.CollectionType {
     ligneDirecte: Attribute.String;
     localisation: Attribute.String;
     nbEtoile: Attribute.Decimal;
-    nbFollowers: Attribute.BigInteger;
+    nbFollowers: Attribute.String;
     publishedAt: Attribute.DateTime;
     reseauxSociaux: Attribute.String;
     responsable: Attribute.String;

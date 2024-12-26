@@ -29,7 +29,7 @@ export default function CustomTable({ rows, setReload, userList }: any) {
   const [currentRow, setCurrentRow] = React.useState<any>({});
   const [openUpdateModal, setOpenUpdateModal] = React.useState<boolean>(false);
   const [openAssign, setOpenAssign] = React.useState<boolean>(false);
-  const [selectedUser,setSelectedUser]= React.useState<number>(0);
+  const [selectedUser, setSelectedUser] = React.useState<number>(0);
 
   const handleDelete = React.useCallback(
     (event: any) => {
@@ -55,15 +55,13 @@ export default function CustomTable({ rows, setReload, userList }: any) {
     setCurrentRow(row);
   }, []);
 
-  const handleChange=(e:any)=>{
+  const handleChange = (e: any) => {
     e.preventDefault();
-    setSelectedUser(e.target.value)
-  }
+    setSelectedUser(e.target.value);
+  };
 
   const handleAssign = React.useCallback(() => {
-
-
-    if(currentRow && selectedUser){
+    if (currentRow && selectedUser) {
       const token = Cookies.get("auth-token");
 
       fetch(`http://localhost:1337/api/fiches/${currentRow.id}`, {
@@ -75,17 +73,15 @@ export default function CustomTable({ rows, setReload, userList }: any) {
         },
         body: JSON.stringify({
           data: {
-            userAssigne: selectedUser
+            userAssigne: selectedUser,
           },
         }),
-      })
+      });
 
       setReload((prev: any) => !prev);
       setOpenAssign(false);
     }
-
-   
-  }, [currentRow,selectedUser,setReload,setOpenAssign]);
+  }, [currentRow, selectedUser, setReload, setOpenAssign]);
 
   return (
     <Box sx={{ height: "100%", width: "100%", mt: "50px", mb: "50px" }}>
@@ -101,15 +97,16 @@ export default function CustomTable({ rows, setReload, userList }: any) {
         </Button>
       </CustomModal>
       <CustomModal open={openAssign} setOpen={setOpenAssign}>
-        <Typography variant="body1" sx={{textAlign:'center',mb:"30px"}}>Assigner la fiche à une autre personne de votre groupe</Typography>
+        <Typography variant="body1" sx={{ textAlign: "center", mb: "30px" }}>
+          Assigner la fiche à une autre personne de votre groupe
+        </Typography>
         <FormControl>
-          <FormLabel id="demo-radio-buttons-group-label">
-          </FormLabel>
+          <FormLabel id="demo-radio-buttons-group-label"></FormLabel>
           <RadioGroup
             aria-labelledby="demo-radio-buttons-group-label"
             defaultValue="female"
             name="radio-buttons-group"
-            sx={{display:'grid',gridTemplateColumns:'repeat(2,1fr)'}}
+            sx={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)" }}
             onChange={handleChange}
             value={selectedUser}
           >
@@ -130,7 +127,7 @@ export default function CustomTable({ rows, setReload, userList }: any) {
           variant="contained"
           color="primary"
           sx={{ mt: "30px" }}
-          onClick={()=>handleAssign()}
+          onClick={() => handleAssign()}
         >
           Confirmer
         </Button>
@@ -501,18 +498,23 @@ export default function CustomTable({ rows, setReload, userList }: any) {
                     >
                       <Edit />
                     </Button>
-                    {(!row?.userAssigne?.data || JSON.parse(user || "").id === row?.user?.data?.id || JSON.parse(user || "").id !== row?.userAssigne?.data?.id ) && <Button
-                      size="small"
-                      variant="outlined"
-                      color="primary"
-                      sx={{ ml: "10px" }}
-                      onClick={() => {
-                        setCurrentRow(row);
-                        setOpenAssign(true);
-                      }}
-                    >
-                      <Share />
-                    </Button>}
+                    {(!row?.userAssigne?.data ||
+                      JSON.parse(user || "").id === row?.user?.data?.id ||
+                      JSON.parse(user || "").id !==
+                        row?.userAssigne?.data?.id) && (
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        color="primary"
+                        sx={{ ml: "10px" }}
+                        onClick={() => {
+                          setCurrentRow(row);
+                          setOpenAssign(true);
+                        }}
+                      >
+                        <Share />
+                      </Button>
+                    )}
                     {type === "ADMIN" && (
                       <Button
                         size="small"

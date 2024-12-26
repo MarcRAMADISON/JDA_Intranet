@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-12-26T11:20:49.000Z"
+    "x-generation-date": "2024-12-26T12:38:04.444Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -781,11 +781,6 @@
                                                     "type": "number",
                                                     "format": "float"
                                                   },
-                                                  "nbFollowers": {
-                                                    "type": "string",
-                                                    "pattern": "^\\d*$",
-                                                    "example": "123456789"
-                                                  },
                                                   "reseauxSociaux": {
                                                     "type": "string"
                                                   },
@@ -847,6 +842,9 @@
                                                         }
                                                       }
                                                     }
+                                                  },
+                                                  "nbFollowers": {
+                                                    "type": "string"
                                                   },
                                                   "createdAt": {
                                                     "type": "string",
@@ -1798,11 +1796,6 @@
                                                                   "type": "number",
                                                                   "format": "float"
                                                                 },
-                                                                "nbFollowers": {
-                                                                  "type": "string",
-                                                                  "pattern": "^\\d*$",
-                                                                  "example": "123456789"
-                                                                },
                                                                 "reseauxSociaux": {
                                                                   "type": "string"
                                                                 },
@@ -1864,6 +1857,9 @@
                                                                       }
                                                                     }
                                                                   }
+                                                                },
+                                                                "nbFollowers": {
+                                                                  "type": "string"
                                                                 },
                                                                 "createdAt": {
                                                                   "type": "string",
@@ -2256,11 +2252,6 @@
                 "type": "number",
                 "format": "float"
               },
-              "nbFollowers": {
-                "type": "string",
-                "pattern": "^\\d*$",
-                "example": "123456789"
-              },
               "reseauxSociaux": {
                 "type": "string"
               },
@@ -2304,6 +2295,9 @@
                   }
                 ],
                 "example": "string or id"
+              },
+              "nbFollowers": {
+                "type": "string"
               }
             }
           }
@@ -2385,11 +2379,6 @@
           "nbEtoile": {
             "type": "number",
             "format": "float"
-          },
-          "nbFollowers": {
-            "type": "string",
-            "pattern": "^\\d*$",
-            "example": "123456789"
           },
           "reseauxSociaux": {
             "type": "string"
@@ -2904,11 +2893,6 @@
                                       "type": "number",
                                       "format": "float"
                                     },
-                                    "nbFollowers": {
-                                      "type": "string",
-                                      "pattern": "^\\d*$",
-                                      "example": "123456789"
-                                    },
                                     "reseauxSociaux": {
                                       "type": "string"
                                     },
@@ -2970,6 +2954,9 @@
                                           }
                                         }
                                       }
+                                    },
+                                    "nbFollowers": {
+                                      "type": "string"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -3330,6 +3317,9 @@
                 }
               }
             }
+          },
+          "nbFollowers": {
+            "type": "string"
           },
           "createdAt": {
             "type": "string",

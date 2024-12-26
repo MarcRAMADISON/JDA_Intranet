@@ -28,7 +28,7 @@ interface ficheFormType {
   telephoneStandard: string;
   nbEtoile: number;
   reseauxSociaux: string;
-  nbFollowers: number;
+  nbFollowers: string;
   siteWeb: string;
   siren:number;
 }
@@ -44,7 +44,7 @@ const defaultValues = {
   telephoneStandard: "",
   nbEtoile: 0,
   reseauxSociaux: "",
-  nbFollowers: 0,
+  nbFollowers: "",
   siteWeb: "",
   siren:0
 };
@@ -320,7 +320,6 @@ function AddFiche({
           label="Nombre de followers"
           variant="standard"
           onChange={handleChange}
-          type="number"
         />
         <TextField
           value={values.siteWeb}
