@@ -29,7 +29,6 @@ export async function POST(request: NextRequest) {
     )
       .then((res) => res.json())
       .then((res) => {
-        console.log('res',res)
         if (res?.data?.length) {
           return new Response(
             JSON.stringify({
