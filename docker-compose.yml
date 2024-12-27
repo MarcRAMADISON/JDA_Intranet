@@ -1,76 +1,48 @@
+
 services:
-
-  nginx:
-    image: nginx:latest
-    restart: unless-stopped
-    container_name: ${PROJECT_SLUG}_nginx
-    ports:
-      - 80:80
-      - 443:443
-    networks:
-      - internal
-    volumes:
-      - ./backend/public:/app/backend/public
-      - ./frontend/public:/app/frontend/public
-      - ./conf/nginx/:/etc/nginx:ro
-      - ./logs/nginx/:/var/log/nginx
-      - /etc/localtime:/etc/localtime:ro
-    depends_on:
-      - frontend
-      - backend
-
-
-  frontend:
-    container_name: ${PROJECT_SLUG}_frontend
+  nextjs:
     build:
-      context: .
-      dockerfile: ./docker/frontend/${ENVIRONMENT}/Dockerfile
-      args:
-        - NODE_ENV=${ENVIRONMENT}
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nextjs
     restart: unless-stopped
-    networks:
-      - internal
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://localhost/api  # Frontend URL to reach the backend
+    ports:
+      - "3000:3000"
     volumes:
       - ./frontend:/app
       - /app/node_modules
-      - /app/.next
-      - ./logs/frontend:/root/.npm/_logs
-    env_file:
-      - ./.env
+    networks:
+      - internal
 
-  backend:
-    container_name: ${PROJECT_SLUG}_backend
+  strapi:
     build:
-      context: .
-      dockerfile: ./docker/backend/${ENVIRONMENT}/Dockerfile
-      args:
-        - NODE_ENV=${ENVIRONMENT}
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: strapi
     restart: unless-stopped
     env_file: .env
     environment:
-      DATABASE_CLIENT: ${DATABASE_CLIENT}
+      DATABASE_CLIENT: postgres
       DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
-      DATABASE_PORT: ${DATABASE_PORT}
-      JWT_SECRET: ${JWT_SECRET}
-      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      NODE_ENV: ${ENVIRONMENT}
-      APP_KEYS: ${APP_KEYS}
+      NODE_ENV: production
     volumes:
       - ./backend:/app
       - /app/node_modules
-      - ./.env:/app/.env
-    networks:
-      - internal
     depends_on:
       - postgres
+    networks:
+      - internal
 
   postgres:
-    image: postgres:12.0-alpine
-    container_name: ${PROJECT_SLUG}_postgres
-    platform: linux/amd64
+    image: postgres:13-alpine
+    container_name: postgres
     restart: unless-stopped
     env_file: .env
     environment:
@@ -78,7 +50,22 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
     volumes:
-      - postgres-data:/var/lib/postgresql/data/
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - internal
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - nextjs
+      - strapi
     networks:
       - internal
 
@@ -87,5 +74,4 @@ volumes:
 
 networks:
   internal:
-    name: ${PROJECT_SLUG}_internal
     driver: bridge

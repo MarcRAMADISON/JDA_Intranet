@@ -1,0 +1,19 @@
+# Dockerfile
+FROM node:18-alpine
+
+# Install dependencies
+WORKDIR /app
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+# Copy project files
+COPY . .
+
+# Build the admin panel
+RUN yarn build
+
+# Expose Strapi port
+EXPOSE 1337
+
+# Start the application
+CMD ["yarn", "start"]

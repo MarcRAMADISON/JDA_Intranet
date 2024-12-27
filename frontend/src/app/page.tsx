@@ -63,7 +63,7 @@ export default function Login() {
                 });
                 route.push("/home");
               })
-              .catch((error) => setShowError(true));
+              .catch(() => setShowError(true));
           } else {
             setShowError(true);
           }
