@@ -13,19 +13,19 @@ export const setAuthCookie = ({
   Cookies.set("auth-token", cookies, {
     expires: 1, // Durée en jours
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    secure: false,//process.env.NODE_ENV === "production",
     sameSite: "strict",
   });
   Cookies.set("user", user, {
     expires: 1, // Durée en jours
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    secure: false,//process.env.NODE_ENV === "production",
     sameSite: "strict",
   });
   Cookies.set("idEquipe", idEquipe, {
     expires: 1, // Durée en jours
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    secure: false,//process.env.NODE_ENV === "production",
     sameSite: "strict",
   });
 };

@@ -4,5 +4,5 @@ module.exports = ({ env }) => ({
   app: {
     keys: env.array('APP_KEYS'),
   },
-  url: env('PUBLIC_URL', 'http://localhost/api'),
+  url: env('PUBLIC_URL', 'http://57.129.42.14/api'),
 });

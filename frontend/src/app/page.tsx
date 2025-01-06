@@ -28,13 +28,12 @@ export default function Login() {
   const [showError, setShowError] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
 
+
   const handleConnect = useCallback(() => {
     if (values.identifier && values.password) {
       setDisabled(true);
 
-      console.log('process.env.NEXT_PUBLIC_URL',process.env.NEXT_PUBLIC_URL || 'http://localhost/api')
-
-      fetch(`${process.env.NEXT_PUBLIC_URL || "http://localhost/api"}/api/auth/local`, {
+      fetch(`${process.env.NEXT_PUBLIC_URL}/api/auth/local`, {
         method: "POST",
         headers: {
           "Content-type": "application/json; charset=UTF-8",
@@ -103,7 +102,7 @@ export default function Login() {
         {showError && (
           <Alert severity="error">Mot de passe ou login invalides</Alert>
         )}
-        <Box sx={{ width: "90%", height: "100px", position: "relative" }}>
+        <Box sx={{ width: "70%", height: "200px", position: "relative",placeSelf:"center",mt:"-30px" }}>
           <Image
             src="/assets/logo-removebg-preview.png"
             alt="JDA logo"
@@ -115,12 +114,13 @@ export default function Login() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+            mt:"-50px"
           }}
         >
           <TextField
             value={values.identifier}
             name="identifier"
-            sx={{ width: "90%" }}
+            sx={{ width: "90%",height:"70px" }}
             id="filled-basic"
             label="Login"
             variant="standard"
@@ -129,7 +129,7 @@ export default function Login() {
           <TextField
             value={values.password}
             name="password"
-            sx={{ width: "90%", marginTop: "20px" }}
+            sx={{ width: "90%", marginTop: "0px" }}
             id="filled-basic"
             label="Mot de passe"
             variant="standard"
