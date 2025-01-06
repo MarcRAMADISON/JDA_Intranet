@@ -121,7 +121,7 @@ function MenuBar({setReload}:any) {
 
       const token = Cookies.get("auth-token");
 
-      fetch(`${process.env.PUBLIC_URL}/api/auth/change-password`, {
+      fetch(`${process.env.NEXT_PUBLIC_URL || "http://localhost/api"}/api/auth/change-password`, {
         method: "POST",
         headers: {
           "Content-type": "application/json; charset=UTF-8",

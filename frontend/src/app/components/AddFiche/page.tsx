@@ -109,7 +109,7 @@ function AddFiche({
       const idUser = JSON.parse(user || "").id;
 
       if (row) {
-        fetch(`${process.env.PUBLIC_URL}/api/fiches/${row.id}`, {
+        fetch(`${process.env.NEXT_PUBLIC_URL || "http://localhost/api"}/api/fiches/${row.id}`, {
           method: "PUT",
           headers: {
             "Content-type": "application/json; charset=UTF-8",

@@ -36,7 +36,7 @@ export default function CustomTable({ rows, setReload, userList }: any) {
       event.preventDefault();
       const token = Cookies.get("auth-token");
 
-      fetch(`${process.env.PUBLIC_URL}/api/fiches/` + currentRow?.id, {
+      fetch(`${process.env.NEXT_PUBLIC_URL || "http://localhost/api"}/api/fiches/` + currentRow?.id, {
         method: "DELETE",
         headers: {
           accept: "application/json",
@@ -64,7 +64,7 @@ export default function CustomTable({ rows, setReload, userList }: any) {
     if (currentRow && selectedUser) {
       const token = Cookies.get("auth-token");
 
-      fetch(`${process.env.PUBLIC_URL}/api/fiches/${currentRow.id}`, {
+      fetch(`${process.env.NEXT_PUBLIC_URL || "http://localhost/api"}/api/fiches/${currentRow.id}`, {
         method: "PUT",
         headers: {
           "Content-type": "application/json; charset=UTF-8",

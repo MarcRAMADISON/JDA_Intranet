@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
   const ligneDirecte=encodeURIComponent(body?.ligneDirecte)
 
     return fetch(
-      `${process.env.PUBLIC_URL}/api/fiches?filters[$or][0][telephoneStandard][$eq]=${
+      `${process.env.NEXT_PUBLIC_URL || "http://localhost/api"}/api/fiches?filters[$or][0][telephoneStandard][$eq]=${
         telephoneStandard || null
       }&filters[$or][1][ligneDirecte][$eq]=${
         ligneDirecte || null
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
           );
         } else {
           
-          return fetch(`${process.env.PUBLIC_URL}/api/fiches`, {
+          return fetch(`${process.env.NEXT_PUBLIC_URL || "http://localhost/api"}/api/fiches`, {
             method: "POST",
             headers: {
               "Content-type": "application/json; charset=UTF-8",

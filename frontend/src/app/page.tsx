@@ -32,7 +32,9 @@ export default function Login() {
     if (values.identifier && values.password) {
       setDisabled(true);
 
-      fetch(`${process.env.PUBLIC_URL}/api/auth/local`, {
+      console.log('process.env.NEXT_PUBLIC_URL',process.env.NEXT_PUBLIC_URL || 'http://localhost/api')
+
+      fetch(`${process.env.NEXT_PUBLIC_URL || "http://localhost/api"}/api/auth/local`, {
         method: "POST",
         headers: {
           "Content-type": "application/json; charset=UTF-8",
@@ -47,8 +49,7 @@ export default function Login() {
         .then((res) => {
           setDisabled(false);
           if (res.status === 200 || res?.jwt) {
-            console.log('process.env.PUBLIC_URL',process.env.PUBLIC_URL)
-            return fetch(`${process.env.PUBLIC_URL}/api/users/me?populate=equipe`, {
+            return fetch(`${process.env.NEXT_PUBLIC_URL || "http://localhost/api" }/api/users/me?populate=equipe`, {
               method: "GET",
               headers: {
                 Authorization: "Bearer " + res?.jwt,
