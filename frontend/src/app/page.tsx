@@ -48,7 +48,7 @@ export default function Login() {
         .then((res) => {
           setDisabled(false);
           if (res.status === 200 || res?.jwt) {
-            return fetch(`${process.env.NEXT_PUBLIC_URL || "http://localhost/api" }/api/users/me?populate=equipe`, {
+            return fetch(`${process.env.NEXT_PUBLIC_URL}/api/users/me?populate=equipe`, {
               method: "GET",
               headers: {
                 Authorization: "Bearer " + res?.jwt,
@@ -102,7 +102,7 @@ export default function Login() {
         {showError && (
           <Alert severity="error">Mot de passe ou login invalides</Alert>
         )}
-        <Box sx={{ width: "70%", height: "200px", position: "relative",placeSelf:"center",mt:"-30px" }}>
+        <Box sx={{ width: "70%", height: "130px", position: "relative",placeSelf:"center",mt:"-30px" }}>
           <Image
             src="/assets/logo-removebg-preview.png"
             alt="JDA logo"
