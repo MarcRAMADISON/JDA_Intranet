@@ -84,8 +84,8 @@ const ExcelFileUploader = () => {
               ? parseFloat(extractValue(d, "réseau"))
               : "",
             nbFollowers: extractValue(d, "follower")
-              ? parseInt(extractValue(d, "follower"), 10)
-              : 0,
+              ? extractValue(d, "follower").toString()
+              : "0",
             siteWeb: extractValue(d, "site") ? extractValue(d, "site") : "",
           }),
         })
