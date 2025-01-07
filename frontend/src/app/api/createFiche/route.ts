@@ -1,24 +1,16 @@
 import { NextRequest } from "next/server";
-import { NextApiResponse } from "next/types";
 
-export async function POST(request: NextRequest,res: NextApiResponse) {
-
-  res.setHeader('Access-Control-Allow-Origin', '*'); // Permet toutes les origines (à limiter en production)
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS'); // Méthodes autorisées
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // En-têtes autorisés
-
-
+export async function POST(request: NextRequest) {
   const body = await request.json();
 
-
   if (body?.telephoneStandard || body?.ligneDirecte) {
-
-    
-  const telephoneStandard=encodeURIComponent(body?.telephoneStandard)
-  const ligneDirecte=encodeURIComponent(body?.ligneDirecte)
+    const telephoneStandard = encodeURIComponent(body?.telephoneStandard);
+    const ligneDirecte = encodeURIComponent(body?.ligneDirecte);
 
     return fetch(
-      `${process.env.NEXT_PUBLIC_URL || "http://localhost/api"}/api/fiches?filters[$or][0][telephoneStandard][$eq]=${
+      `${
+        process.env.NEXT_PUBLIC_URL
+      }/api/fiches?filters[$or][0][telephoneStandard][$eq]=${
         telephoneStandard || null
       }&filters[$or][1][ligneDirecte][$eq]=${
         ligneDirecte || null
@@ -45,12 +37,16 @@ export async function POST(request: NextRequest,res: NextApiResponse) {
             }),
             {
               status: 500,
-              headers: { "Content-Type": "application/json" },
+              headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+              },
             }
           );
         } else {
-          
-          return fetch(`${process.env.NEXT_PUBLIC_URL || "http://localhost/api"}/api/fiches`, {
+          return fetch(`${process.env.NEXT_PUBLIC_URL}/api/fiches`, {
             method: "POST",
             headers: {
               "Content-type": "application/json; charset=UTF-8",
@@ -64,14 +60,24 @@ export async function POST(request: NextRequest,res: NextApiResponse) {
               if (res.data) {
                 return new Response(JSON.stringify({ ...res?.data }), {
                   status: 200,
-                  headers: { "Content-Type": "application/json" },
+                  headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                  },
                 });
               } else {
                 return new Response(
                   JSON.stringify({ message: "Error creation", status: "500" }),
                   {
                     status: 500,
-                    headers: { "Content-Type": "application/json" },
+                    headers: {
+                      "Content-Type": "application/json",
+                      "Access-Control-Allow-Origin": "*",
+                      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                    },
                   }
                 );
               }
@@ -81,7 +87,12 @@ export async function POST(request: NextRequest,res: NextApiResponse) {
                 JSON.stringify({ message: "Error creation", status: "500" }),
                 {
                   status: 500,
-                  headers: { "Content-Type": "application/json" },
+                  headers: {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                  },
                 }
               );
             });
@@ -92,7 +103,12 @@ export async function POST(request: NextRequest,res: NextApiResponse) {
       JSON.stringify({ message: "Error creation", status: "500" }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        },
       }
     );
   }
