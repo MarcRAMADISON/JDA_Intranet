@@ -151,11 +151,10 @@ function AddFiche({
         return;
       }
 
-      fetch("/api/createFiche", {
+      fetch(`${process.env.NEXT_PUBLIC_FRONT_API_URL}/api/createFiche`, {
         method: "POST",
         headers: {
           "Content-type": "application/json; charset=UTF-8",
-          accept: "application/json",
           Authorization: "bearer " + token,
         },
         body: JSON.stringify({

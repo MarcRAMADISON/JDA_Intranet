@@ -50,7 +50,7 @@ const ExcelFileUploader = () => {
       setDisabled(true)
 
       data.map((d) => {
-        fetch("http://localhost:3000/api/createFiche", {
+        fetch(`${process.env.NEXT_PUBLIC_FRONT_API_URL}/api/createFiche`, {
           method: "POST",
           headers: {
             "Content-type": "application/json; charset=UTF-8",
