@@ -109,7 +109,7 @@ function AddFiche({
       const idUser = JSON.parse(user || "").id;
 
       if (row) {
-        fetch(`${process.env.NEXT_PUBLIC_URL || "http://localhost/api"}/api/fiches/${row.id}`, {
+        fetch(`${process.env.NEXT_PUBLIC_URL}/api/fiches/${row.id}`, {
           method: "PUT",
           headers: {
             "Content-type": "application/json; charset=UTF-8",
@@ -151,7 +151,7 @@ function AddFiche({
         return;
       }
 
-      fetch("http://localhost:3000/api/createFiche", {
+      fetch("/api/createFiche", {
         method: "POST",
         headers: {
           "Content-type": "application/json; charset=UTF-8",
