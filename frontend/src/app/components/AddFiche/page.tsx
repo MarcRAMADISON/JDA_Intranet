@@ -81,7 +81,7 @@ function AddFiche({
         telephoneStandard: row?.telephoneStandard || '',
         nbEtoile: row?.nbEtoile || 0,
         reseauxSociaux: row?.reseauxSociaux || '',
-        nbFollowers: row?.nbFollowers || 0,
+        nbFollowers: row?.nbFollowers || "0",
         siteWeb: row?.siteWeb || '',
         siren: row?.siren || 0
       });
