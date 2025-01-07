@@ -112,7 +112,7 @@ export async function getData({
 
   if (filters?.statut && filters?.statut !== 'TOUT' && !isAll) {
     rows = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/fiches${query}filters[statut][$eq]=${
+      `${process.env.NEXT_PUBLIC_URL}/api/fiches${query}filters[statut][$eq]=${
         filters.statut
       }&pagination[start]=${start || 0}&pagination[limit]=${
         limit || 20
@@ -128,7 +128,7 @@ export async function getData({
     );
   } else if (isAll && (!filters?.statut || filters?.statut === "TOUT")) {
     rows = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/fiches${query}populate=user,venduePar,userAssigne&pagination[limit]=999`,
+      `${process.env.NEXT_PUBLIC_URL}/api/fiches${query}populate=user,venduePar,userAssigne&pagination[limit]=999`,
       {
         method: "GET",
         headers: {
@@ -140,7 +140,7 @@ export async function getData({
     );
   } else if (isAll && filters?.statut) {
     rows = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/fiches${query}filters[statut][$eq]=${filters?.statut}&populate=user,venduePar,userAssigne&pagination[limit]=999`,
+      `${process.env.NEXT_PUBLIC_URL}/api/fiches${query}filters[statut][$eq]=${filters?.statut}&populate=user,venduePar,userAssigne&pagination[limit]=999`,
       {
         method: "GET",
         headers: {
@@ -152,7 +152,7 @@ export async function getData({
     );
   } else {
     rows = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/fiches${query}pagination[start]=${
+      `${process.env.NEXT_PUBLIC_URL}/api/fiches${query}pagination[start]=${
         start || 0
       }&pagination[limit]=${limit || 20}&populate=user,venduePar,userAssigne`,
       {
