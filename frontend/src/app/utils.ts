@@ -81,6 +81,33 @@ export const extractValue = (data: any, keyWord: string) => {
   return keyFound ? data[keyFound] : undefined;
 };
 
+export const sortData=(data:any)=>{
+  const priorites = ["Nouveau", "A rappeler","Injoignable","Ne répond pas","Hors cible","Ne plus appeler","Faux numéro","Vente OK"]; // Ordre de priorité pour les villes
+  console.log('data',data)
+const tableauTrie = data.sort((a:any, b:any) => {
+  // Trouver les index des villes dans la liste des priorités
+  const indexA = priorites.indexOf(a?.statut);
+  const indexB = priorites.indexOf(b?.statut);
+
+  // Si les deux villes sont dans la liste des priorités, on compare leurs index
+  if (indexA !== -1 && indexB !== -1) {
+    return indexA - indexB;
+  }
+
+  // Si une seule ville est dans la liste des priorités, elle passe en premier
+  if (indexA !== -1) return -1;
+  if (indexB !== -1) return 1;
+
+  // Sinon, on les garde dans l'ordre alphabétique
+  return a.ville.localeCompare(b.ville);
+});
+
+
+return tableauTrie;
+
+}
+
+
 interface filterObject {
   statut: string;
   userId: number;

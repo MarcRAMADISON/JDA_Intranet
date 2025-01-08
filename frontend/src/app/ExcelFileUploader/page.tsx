@@ -80,8 +80,8 @@ const ExcelFileUploader = () => {
               ? extractValue(d, "standard").toString()
               : "",
             nbEtoile: extractValue(d, "étoile") ? extractValue(d, "étoile") : 0,
-            reseauxSociaux: extractValue(d, "réseau")
-              ? parseFloat(extractValue(d, "réseau"))
+            reseauxSociaux: extractValue(d, "sociaux")
+              ? parseFloat(extractValue(d, "sociaux"))
               : "",
             nbFollowers: extractValue(d, "follower")
               ? extractValue(d, "follower").toString()

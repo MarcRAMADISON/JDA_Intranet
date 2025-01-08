@@ -14,7 +14,7 @@ import MenuBar from "../components/MenuBar/page";
 import CustomTable from "../components/Table/page";
 import { useCallback, useEffect, useState } from "react";
 import AddFiche from "../components/AddFiche/page";
-import { getData, getUsers, handleExport } from "../utils";
+import { getData, getUsers, handleExport, sortData } from "../utils";
 import { Download } from "@mui/icons-material";
 import Cookies from "js-cookie";
 
@@ -48,7 +48,7 @@ function Home() {
           ...d.attributes,
           total: res?.meta?.pagination?.total || 0,
         }));
-        setRows(data);
+        setRows(sortData(data));
       });
 
     const user = Cookies.get("user");
@@ -86,7 +86,7 @@ function Home() {
             ...d.attributes,
             total: res?.meta?.pagination?.total || 0,
           }));
-          setRows(data);
+          setRows(sortData(data));
         });
     } else {
       getData({ filters:{...filters,[event.target.name]:event.target.value} })
@@ -97,7 +97,7 @@ function Home() {
             ...d.attributes,
             total: res?.meta?.pagination?.total || 0,
           }));
-          setRows(data);
+          setRows(sortData(data));
         });
     }
   }, [filters]);
@@ -113,7 +113,7 @@ function Home() {
             ...d.attributes,
             total: res?.meta?.pagination?.total || 0,
           }));
-          setRows(data);
+          setRows(sortData(data));
           setCurrentPage(page);
         });
     },
@@ -141,7 +141,7 @@ function Home() {
               nbFollowers: d.attributes.nbFollowers,
               "Site web": d.attributes.siteWeb,
             }));
-            handleExport(newData);
+            handleExport(sortData(newData));
           });
       } else {
         getData({ isAll: true })
@@ -161,7 +161,7 @@ function Home() {
               nbFollowers: d.attributes.nbFollowers,
               "Site web": d.attributes.siteWeb,
             }));
-            handleExport(newData);
+            handleExport(sortData(newData));
           });
       }
     },
