@@ -27,12 +27,19 @@ import moment from "moment";
 
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
-export default function CustomTable({ rows, setReload, userList, selectedRows,setSelectedRows, openAssign, setOpenAssign,filters}: any) {
+export default function CustomTable({
+  rows,
+  setReload,
+  userList,
+  selectedRows,
+  setSelectedRows,
+  openAssign,
+  setOpenAssign,
+}: any) {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [currentRow, setCurrentRow] = React.useState<any>({});
   const [openUpdateModal, setOpenUpdateModal] = React.useState<boolean>(false);
   const [selectedUser, setSelectedUser] = React.useState<number>(0);
-  
 
   const handleDelete = React.useCallback(
     (event: any) => {
@@ -64,37 +71,44 @@ export default function CustomTable({ rows, setReload, userList, selectedRows,se
   };
 
   const handleAssign = React.useCallback(() => {
-    console.log('filters',filters,selectedUser,selectedRows)
+    const user = Cookies.get("user");
 
-    if(selectedRows.length){
-
-      console.log('filters 2',filters,selectedUser)
-
+    if (selectedRows.length) {
       const token = Cookies.get("auth-token");
 
-      Promise.all(selectedRows.map((row:string)=>{
-        fetch(`${process.env.NEXT_PUBLIC_URL}/api/fiches/${row}`, {
-          method: "PUT",
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-            accept: "application/json",
-            Authorization: "bearer " + token,
-          },
-          body: JSON.stringify({
-            data: {
-              userAssigne: selectedUser,
-            },
-          }),
-        });
-  
-       
-      })).then(()=>{
+      Promise.all(
+        selectedRows.map((row: any) => {
+          console.log(
+            "assign",
+            JSON.parse(user || "").id,
+            row?.userAssigne,
+            JSON.parse(user || "").id === row?.user?.data?.id
+          );
+          if (
+            (JSON.parse(user || "").id !== row?.userAssigne &&
+              JSON.parse(user || "").id === row?.createdBy) ||
+            JSON.parse(user || "").type === "ADMIN"
+          ) {
+            fetch(`${process.env.NEXT_PUBLIC_URL}/api/fiches/${row?.id}`, {
+              method: "PUT",
+              headers: {
+                "Content-type": "application/json; charset=UTF-8",
+                accept: "application/json",
+                Authorization: "bearer " + token,
+              },
+              body: JSON.stringify({
+                data: {
+                  userAssigne: selectedUser,
+                },
+              }),
+            });
+          }
+        })
+      ).then(() => {
         setReload((prev: any) => !prev);
         setOpenAssign(false);
-      })
+      });
     } else if (currentRow && selectedUser) {
-      console.log('filters 3',filters,selectedUser)
-
       const token = Cookies.get("auth-token");
 
       fetch(`${process.env.NEXT_PUBLIC_URL}/api/fiches/${currentRow.id}`, {
@@ -114,7 +128,7 @@ export default function CustomTable({ rows, setReload, userList, selectedRows,se
       setReload((prev: any) => !prev);
       setOpenAssign(false);
     }
-  }, [currentRow, selectedUser, setReload, setOpenAssign,selectedRows,filters]);
+  }, [currentRow, selectedUser, setReload, setOpenAssign, selectedRows]);
 
   return (
     <Box sx={{ height: "100%", width: "100%", mt: "50px", mb: "50px" }}>
@@ -185,11 +199,15 @@ export default function CustomTable({ rows, setReload, userList, selectedRows,se
                     },
                   }}
                   onClick={() => {
-                    setSelectedRows((prev:any)=>{
-                      if(prev.length && prev.length === rows.length){
-                        return []
+                    setSelectedRows((prev: any) => {
+                      if (prev.length && prev.length === rows.length) {
+                        return [];
                       }
-                      return rows.map((r:any)=>r.id)
+                      return rows.map((r: any) => ({
+                        id: r.id,
+                        userAssigne: r?.userAssigne?.data?.id,
+                        createdBy: r?.user?.data?.id,
+                      }));
                     });
                   }}
                 />
@@ -395,14 +413,25 @@ export default function CustomTable({ rows, setReload, userList, selectedRows,se
                   <TableCell>
                     <Checkbox
                       {...label}
-                      checked={selectedRows.includes(row.id) || false}
+                      checked={
+                        selectedRows.find((r: any) => r.id === row.id) || false
+                      }
                       onChange={() => {
                         setCurrentRow(row);
-                        setSelectedRows((prev:any) => {
-                          const alreadyExists = prev.find((p:string) => p === row?.id);
+                        setSelectedRows((prev: any) => {
+                          const alreadyExists = prev.find(
+                            (p: any) => p.id === row?.id
+                          );
 
-                          const result = prev.filter((p:string) => p !== row.id);
-                          if (!alreadyExists) result.push(row.id);
+                          const result = prev.filter(
+                            (p: any) => p.id !== row.id
+                          );
+                          if (!alreadyExists)
+                            result.push({
+                              id: row.id,
+                              userAssigne: row?.userAssigne?.data?.id,
+                              createdBy: row?.user?.data?.id,
+                            });
                           return result;
                         });
                       }}

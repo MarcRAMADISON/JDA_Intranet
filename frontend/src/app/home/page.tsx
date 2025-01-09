@@ -26,6 +26,12 @@ interface filterObject {
   multiSelectUserId?:number;
 }
 
+interface selectedRowObject {
+  id:string,
+  userAssign:string,
+  createdBy:string
+}
+
 const defaultFilter = {
   statut: "",
   userId: 0,
@@ -42,7 +48,7 @@ function Home() {
   const [userList, setUserList] =
     useState<{ id: number; username: string; type: string }[]>();
   const [filters, setFilters] = useState<filterObject>(defaultFilter);
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [selectedRows, setSelectedRows] = useState<selectedRowObject[]>([]);
   const [openAssign, setOpenAssign] = useState<boolean>(false);
   const [openChangeMultiple, setOpenChangeMultiple] = useState<boolean>(false);
 
