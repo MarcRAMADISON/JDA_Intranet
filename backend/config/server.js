@@ -4,7 +4,5 @@ module.exports = ({ env }) => ({
   app: {
     keys: env.array('APP_KEYS'),
   },
-  webhooks: {
-    populateRelations: env.bool('WEBHOOKS_POPULATE_RELATIONS', false),
-  },
+  url: env('PUBLIC_URL', 'http://57.129.42.14/api'),
 });
