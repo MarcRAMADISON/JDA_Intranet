@@ -51,6 +51,7 @@ function Home() {
   const [selectedRows, setSelectedRows] = useState<selectedRowObject[]>([]);
   const [openAssign, setOpenAssign] = useState<boolean>(false);
   const [openChangeMultiple, setOpenChangeMultiple] = useState<boolean>(false);
+  const [openModalDelete,setOpenModalDelete]=useState<boolean>(false);
 
   useEffect(() => {
     getData({ start: 20 * (currentPage - 1), limit: 20 })
@@ -215,6 +216,31 @@ function Home() {
     }
   }, [filters.multiSelectStatut, selectedRows]);
 
+  const handleDelete = useCallback(
+    (event: any) => {
+      event.preventDefault();
+      const token = Cookies.get("auth-token");
+
+      if(selectedRows.length){
+        Promise.all(selectedRows.map(async(row)=>{
+          await fetch(`${process.env.NEXT_PUBLIC_URL}/api/fiches/` + row?.id, {
+            method: "DELETE",
+            headers: {
+              accept: "application/json",
+              Authorization: "Bearer " + token,
+            },
+          });
+        })).then(()=>{
+          setSelectedRows([])
+          setReload((prev: any) => !prev);
+          setOpenModalDelete(false);
+        })
+      }
+
+    },
+    [selectedRows]
+  );
+
   return (
     <Box
       sx={{
@@ -225,6 +251,17 @@ function Home() {
       }}
     >
       <MenuBar setReload={setReload} />
+      <CustomModal open={openModalDelete} setOpen={setOpenModalDelete}>
+        <Typography>Voulez-vous vraiment supprimer cette fiche?</Typography>
+        <Button
+          variant="contained"
+          color="error"
+          sx={{ mt: "30px" }}
+          onClick={handleDelete}
+        >
+          Confirmer
+        </Button>
+      </CustomModal>
       <CustomModal open={openChangeMultiple} setOpen={setOpenChangeMultiple}>
         <FormControl sx={{ minWidth: "250px", mt: "30px" }}>
           <InputLabel id="demo-simple-select-label">Statut</InputLabel>
@@ -386,7 +423,7 @@ function Home() {
                 variant="outlined"
                 color="error"
                 sx={{ ml: "10px" }}
-                onClick={() => {}}
+                onClick={() => {setOpenModalDelete(true)}}
               >
                 Supprimer
               </Button>

@@ -126,7 +126,7 @@ export default function CustomTable({
   }, [selectedRows, currentRow, selectedUser, setSelectedRows, setReload, setOpenAssign]);
 
   return (
-    <Box sx={{ height: "100%", width: "100%", mt: "50px", mb: "50px" }}>
+    <Box sx={{ height: "60vh", width: "100%", mt: "50px", mb: "50px",overflow:'scroll' }}>
       <CustomModal open={openModal} setOpen={setOpenModal}>
         <Typography>Voulez-vous vraiment supprimer cette fiche?</Typography>
         <Button
