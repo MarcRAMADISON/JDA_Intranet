@@ -23,19 +23,19 @@ interface filterObject {
   statut: string;
   userId: number;
   multiSelectStatut?: string;
-  multiSelectUserId?:number;
+  multiSelectUserId?: number;
 }
 
 interface selectedRowObject {
-  id:string,
-  userAssign:string,
-  createdBy:string
+  id: string;
+  userAssign: string;
+  createdBy: string;
 }
 
 const defaultFilter = {
   statut: "",
   userId: 0,
-  multiSelectUserId:0,
+  multiSelectUserId: 0,
   multiSelectStatut: "Nouveau",
 };
 
@@ -186,6 +186,34 @@ function Home() {
     [filters]
   );
 
+  const handleChangeStatutMultiRows = useCallback(() => {
+    console.log("multiple", selectedRows, filters.multiSelectStatut);
+    if (selectedRows.length && filters.multiSelectStatut) {
+      const token = Cookies.get("auth-token");
+
+      Promise.all(selectedRows.map(async(row)=>{
+        await fetch(`${process.env.NEXT_PUBLIC_URL}/api/fiches/${row.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+            accept: "application/json",
+            Authorization: "bearer " + token,
+          },
+          body: JSON.stringify({
+            data: {
+              statut: filters.multiSelectStatut,
+            },
+          }),
+        });
+
+      })).then(()=>{
+        setOpenChangeMultiple(false)
+        setReload((prev)=>!prev)
+      })
+      
+    }
+  }, [filters.multiSelectStatut, selectedRows]);
+
   return (
     <Box
       sx={{
@@ -197,8 +225,8 @@ function Home() {
     >
       <MenuBar setReload={setReload} />
       <CustomModal open={openChangeMultiple} setOpen={setOpenChangeMultiple}>
-        <FormControl sx={{ minWidth: "250px" }}>
-          <InputLabel id="demo-simple-select-label">Modifier statut</InputLabel>
+        <FormControl sx={{ minWidth: "250px", mt: "30px" }}>
+          <InputLabel id="demo-simple-select-label">Statut</InputLabel>
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
@@ -223,6 +251,14 @@ function Home() {
             <MenuItem value="Vente OK">Vente OK</MenuItem>
           </Select>
         </FormControl>
+        <Button
+          sx={{ mt: "20px" }}
+          variant="contained"
+          color="primary"
+          onClick={handleChangeStatutMultiRows}
+        >
+          Modifier
+        </Button>
       </CustomModal>
       <AddFiche
         openModal={openModal}

@@ -77,19 +77,13 @@ export default function CustomTable({
       const token = Cookies.get("auth-token");
 
       Promise.all(
-        selectedRows.map((row: any) => {
-          console.log(
-            "assign",
-            JSON.parse(user || "").id,
-            row?.userAssigne,
-            JSON.parse(user || "").id === row?.user?.data?.id
-          );
+        selectedRows.map(async(row: any) => {
           if (
             (JSON.parse(user || "").id !== row?.userAssigne &&
               JSON.parse(user || "").id === row?.createdBy) ||
             JSON.parse(user || "").type === "ADMIN"
           ) {
-            fetch(`${process.env.NEXT_PUBLIC_URL}/api/fiches/${row?.id}`, {
+            await fetch(`${process.env.NEXT_PUBLIC_URL}/api/fiches/${row?.id}`, {
               method: "PUT",
               headers: {
                 "Content-type": "application/json; charset=UTF-8",
