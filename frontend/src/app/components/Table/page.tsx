@@ -123,7 +123,7 @@ export default function CustomTable({
       setReload((prev: any) => !prev);
       setOpenAssign(false);
     }
-  }, [currentRow, selectedUser, setReload, setOpenAssign, selectedRows]);
+  }, [selectedRows, currentRow, selectedUser, setSelectedRows, setReload, setOpenAssign]);
 
   return (
     <Box sx={{ height: "100%", width: "100%", mt: "50px", mb: "50px" }}>

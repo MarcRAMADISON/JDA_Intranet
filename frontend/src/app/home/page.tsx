@@ -360,11 +360,12 @@ function Home() {
               variant="outlined"
               color="primary"
               sx={{ ml: "10px" }}
+              startIcon={<Share />}
               onClick={() => {
                 setOpenAssign(true);
               }}
             >
-              <Share />
+              Assigner
             </Button>
             <Button
               size="small"
@@ -380,13 +381,14 @@ function Home() {
             </Button>
             {userType === "ADMIN" && (
               <Button
+                startIcon={<Delete />}
                 size="small"
                 variant="outlined"
                 color="error"
                 sx={{ ml: "10px" }}
                 onClick={() => {}}
               >
-                <Delete />
+                Supprimer
               </Button>
             )}
           </Box>
