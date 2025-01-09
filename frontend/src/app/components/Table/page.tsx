@@ -35,6 +35,8 @@ export default function CustomTable({
   setSelectedRows,
   openAssign,
   setOpenAssign,
+  loading,
+  setLoading
 }: any) {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [currentRow, setCurrentRow] = React.useState<any>({});
@@ -75,6 +77,7 @@ export default function CustomTable({
 
     if (selectedRows.length) {
       const token = Cookies.get("auth-token");
+      setLoading((prev:any)=>({...prev,assign:true}))
 
       Promise.all(
         selectedRows.map(async(row: any) => {
@@ -102,6 +105,8 @@ export default function CustomTable({
         setSelectedRows([])
         setReload((prev: any) => !prev);
         setOpenAssign(false);
+        setLoading((prev: any)=>({...prev,delete:false}))
+
       });
     } else if (currentRow && selectedUser) {
       const token = Cookies.get("auth-token");
@@ -170,6 +175,7 @@ export default function CustomTable({
           color="primary"
           sx={{ mt: "30px" }}
           onClick={() => handleAssign()}
+          disabled={loading.assign && selectedRows.length}
         >
           Confirmer
         </Button>

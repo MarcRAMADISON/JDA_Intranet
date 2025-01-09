@@ -32,6 +32,12 @@ interface selectedRowObject {
   createdBy: string;
 }
 
+interface loadinObject {
+  assign: boolean;
+  delete: boolean;
+  change: boolean;
+}
+
 const defaultFilter = {
   statut: "",
   userId: 0,
@@ -51,7 +57,12 @@ function Home() {
   const [selectedRows, setSelectedRows] = useState<selectedRowObject[]>([]);
   const [openAssign, setOpenAssign] = useState<boolean>(false);
   const [openChangeMultiple, setOpenChangeMultiple] = useState<boolean>(false);
-  const [openModalDelete,setOpenModalDelete]=useState<boolean>(false);
+  const [openModalDelete, setOpenModalDelete] = useState<boolean>(false);
+  const [loading, setLoading] = useState<loadinObject>({
+    assign: false,
+    delete: false,
+    change: false,
+  });
 
   useEffect(() => {
     getData({ start: 20 * (currentPage - 1), limit: 20 })
@@ -188,55 +199,66 @@ function Home() {
   );
 
   const handleChangeStatutMultiRows = useCallback(() => {
-    console.log("multiple", selectedRows, filters.multiSelectStatut);
+
+    setLoading((prev)=>({...prev,change:true}))
+
     if (selectedRows.length && filters.multiSelectStatut) {
       const token = Cookies.get("auth-token");
 
-      Promise.all(selectedRows.map(async(row)=>{
-        await fetch(`${process.env.NEXT_PUBLIC_URL}/api/fiches/${row.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-            accept: "application/json",
-            Authorization: "bearer " + token,
-          },
-          body: JSON.stringify({
-            data: {
-              statut: filters.multiSelectStatut,
+      Promise.all(
+        selectedRows.map(async (row) => {
+          await fetch(`${process.env.NEXT_PUBLIC_URL}/api/fiches/${row.id}`, {
+            method: "PUT",
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+              accept: "application/json",
+              Authorization: "bearer " + token,
             },
-          }),
-        });
+            body: JSON.stringify({
+              data: {
+                statut: filters.multiSelectStatut,
+              },
+            }),
+          });
+        })
+      ).then(() => {
+        setSelectedRows([]);
+        setOpenChangeMultiple(false);
+        setReload((prev) => !prev);
+        setLoading((prev)=>({...prev,change:false}))
 
-      })).then(()=>{
-        setSelectedRows([])
-        setOpenChangeMultiple(false)
-        setReload((prev)=>!prev)
-      })
-      
+      });
     }
-  }, [filters.multiSelectStatut, selectedRows]);
+
+  }, [filters.multiSelectStatut, selectedRows,setLoading]);
 
   const handleDelete = useCallback(
     (event: any) => {
       event.preventDefault();
+      setLoading((prev)=>({...prev,delete:true}))
       const token = Cookies.get("auth-token");
 
-      if(selectedRows.length){
-        Promise.all(selectedRows.map(async(row)=>{
-          await fetch(`${process.env.NEXT_PUBLIC_URL}/api/fiches/` + row?.id, {
-            method: "DELETE",
-            headers: {
-              accept: "application/json",
-              Authorization: "Bearer " + token,
-            },
-          });
-        })).then(()=>{
-          setSelectedRows([])
+      if (selectedRows.length) {
+        Promise.all(
+          selectedRows.map(async (row) => {
+            await fetch(
+              `${process.env.NEXT_PUBLIC_URL}/api/fiches/` + row?.id,
+              {
+                method: "DELETE",
+                headers: {
+                  accept: "application/json",
+                  Authorization: "Bearer " + token,
+                },
+              }
+            );
+          })
+        ).then(() => {
+          setSelectedRows([]);
           setReload((prev: any) => !prev);
           setOpenModalDelete(false);
-        })
+          setLoading((prev)=>({...prev,delete:false}))
+        });
       }
-
     },
     [selectedRows]
   );
@@ -258,6 +280,7 @@ function Home() {
           color="error"
           sx={{ mt: "30px" }}
           onClick={handleDelete}
+          disabled={loading.delete}
         >
           Confirmer
         </Button>
@@ -294,6 +317,7 @@ function Home() {
           variant="contained"
           color="primary"
           onClick={handleChangeStatutMultiRows}
+          disabled={loading.change}
         >
           Modifier
         </Button>
@@ -423,11 +447,14 @@ function Home() {
                 variant="outlined"
                 color="error"
                 sx={{ ml: "10px" }}
-                onClick={() => {setOpenModalDelete(true)}}
+                onClick={() => {
+                  setOpenModalDelete(true);
+                }}
               >
                 Supprimer
               </Button>
             )}
+            <Typography variant="body2" color="text.secondary">{selectedRows.length} fiches sélectionnées</Typography>
           </Box>
         ) : (
           <></>
@@ -442,6 +469,8 @@ function Home() {
           openAssign={openAssign}
           setOpenAssign={setOpenAssign}
           filters={filters}
+          loading={loading}
+          setLoading={setLoading}
         />
         <Box
           sx={{

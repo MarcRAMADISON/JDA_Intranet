@@ -84,21 +84,20 @@ export const extractValue = (data: any, keyWord: string) => {
 export const sortData=(data:any)=>{
   const priorites = ["Nouveau", "A rappeler","Injoignable","Ne répond pas","Hors cible","Ne plus appeler","Faux numéro","Vente OK"]; // Ordre de priorité pour les villes
 const tableauTrie = data.sort((a:any, b:any) => {
-  // Trouver les index des villes dans la liste des priorités
   const indexA = priorites.indexOf(a?.statut);
   const indexB = priorites.indexOf(b?.statut);
 
-  // Si les deux villes sont dans la liste des priorités, on compare leurs index
   if (indexA !== -1 && indexB !== -1) {
     return indexA - indexB;
   }
 
-  // Si une seule ville est dans la liste des priorités, elle passe en premier
   if (indexA !== -1) return -1;
   if (indexB !== -1) return 1;
 
- 
-});
+
+  return a?.statut && b?.statut && a?.statut.localeCompare(b?.statut);
+}
+);
 
 
 return tableauTrie;
@@ -141,7 +140,7 @@ export async function getData({
         filters.statut
       }&pagination[start]=${start || 0}&pagination[limit]=${
         limit || 20
-      }&populate=user,venduePar,userAssigne`,
+      }&populate=user,venduePar,userAssigne&sort=createdAt:desc`,
       {
         method: "GET",
         headers: {
@@ -153,7 +152,7 @@ export async function getData({
     );
   } else if (isAll && (!filters?.statut || filters?.statut === "TOUT")) {
     rows = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/api/fiches${query}populate=user,venduePar,userAssigne&pagination[limit]=999`,
+      `${process.env.NEXT_PUBLIC_URL}/api/fiches${query}populate=user,venduePar,userAssigne&pagination[limit]=999&sort=createdAt:desc`,
       {
         method: "GET",
         headers: {
@@ -165,7 +164,7 @@ export async function getData({
     );
   } else if (isAll && filters?.statut) {
     rows = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/api/fiches${query}filters[statut][$eq]=${filters?.statut}&populate=user,venduePar,userAssigne&pagination[limit]=999`,
+      `${process.env.NEXT_PUBLIC_URL}/api/fiches${query}filters[statut][$eq]=${filters?.statut}&populate=user,venduePar,userAssigne&pagination[limit]=999&sort=createdAt:desc`,
       {
         method: "GET",
         headers: {
@@ -179,7 +178,7 @@ export async function getData({
     rows = await fetch(
       `${process.env.NEXT_PUBLIC_URL}/api/fiches${query}pagination[start]=${
         start || 0
-      }&pagination[limit]=${limit || 20}&populate=user,venduePar,userAssigne`,
+      }&pagination[limit]=${limit || 20}&populate=user,venduePar,userAssigne&sort=createdAt:desc`,
       {
         method: "GET",
         headers: {
