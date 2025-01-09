@@ -207,6 +207,7 @@ function Home() {
         });
 
       })).then(()=>{
+        setSelectedRows([])
         setOpenChangeMultiple(false)
         setReload((prev)=>!prev)
       })

@@ -75,7 +75,7 @@ const ExcelFileUploader = () => {
             ligneDirecte: extractValue(d, "directe")
               ? extractValue(d, "directe").toString()
               : "",
-            statut: extractValue(d, "statut") ? extractValue(d, "statut") : "",
+            statut: extractValue(d, "statut") ? extractValue(d, "statut") : "Nouveau",
             telephoneStandard: extractValue(d, "standard")
               ? extractValue(d, "standard").toString()
               : "",

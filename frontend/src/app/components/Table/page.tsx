@@ -99,6 +99,7 @@ export default function CustomTable({
           }
         })
       ).then(() => {
+        setSelectedRows([])
         setReload((prev: any) => !prev);
         setOpenAssign(false);
       });
@@ -214,6 +215,16 @@ export default function CustomTable({
                   minWidth: "150px",
                 }}
               >
+                Statut
+              </TableCell>
+              <TableCell
+                style={{
+                  fontSize: "0.9rem",
+                  color: "#fff",
+                  fontWeight: "bold",
+                  minWidth: "150px",
+                }}
+              >
                 Date création
               </TableCell>
               <TableCell
@@ -284,16 +295,6 @@ export default function CustomTable({
                   minWidth: "150px",
                 }}
               >
-                Localisation
-              </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "0.9rem",
-                  color: "#fff",
-                  fontWeight: "bold",
-                  minWidth: "150px",
-                }}
-              >
                 Téléphone standard
               </TableCell>
               <TableCell
@@ -305,6 +306,16 @@ export default function CustomTable({
                 }}
               >
                 Ligne direct
+              </TableCell>
+              <TableCell
+                style={{
+                  fontSize: "0.9rem",
+                  color: "#fff",
+                  fontWeight: "bold",
+                  minWidth: "150px",
+                }}
+              >
+                Localisation
               </TableCell>
               <TableCell
                 style={{
@@ -366,16 +377,6 @@ export default function CustomTable({
               >
                 Siren
               </TableCell>
-              <TableCell
-                style={{
-                  fontSize: "0.9rem",
-                  color: "#fff",
-                  fontWeight: "bold",
-                  minWidth: "150px",
-                }}
-              >
-                Statut
-              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -430,6 +431,19 @@ export default function CustomTable({
                         });
                       }}
                     />
+                  </TableCell>
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                    sx={{
+                      ...statusStyle,
+                      cursor: "pointer",
+                      minWidth: "100px",
+                    }}
+                  >
+                    {row.statut}
                   </TableCell>
                   <TableCell
                     onClick={() => {
@@ -493,14 +507,6 @@ export default function CustomTable({
                       setOpenUpdateModal(true);
                     }}
                   >
-                    {row.localisation}
-                  </TableCell>
-                  <TableCell
-                    onClick={() => {
-                      setCurrentRow(row);
-                      setOpenUpdateModal(true);
-                    }}
-                  >
                     {row.telephoneStandard}
                   </TableCell>
                   <TableCell
@@ -510,6 +516,14 @@ export default function CustomTable({
                     }}
                   >
                     {row.ligneDirecte}
+                  </TableCell>
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                  >
+                    {row.localisation}
                   </TableCell>
                   <TableCell
                     onClick={() => {
@@ -564,19 +578,6 @@ export default function CustomTable({
                     }}
                   >
                     {row.siren}
-                  </TableCell>
-                  <TableCell
-                    onClick={() => {
-                      setCurrentRow(row);
-                      setOpenUpdateModal(true);
-                    }}
-                    sx={{
-                      ...statusStyle,
-                      cursor: "pointer",
-                      minWidth: "100px",
-                    }}
-                  >
-                    {row.statut}
                   </TableCell>
                   <TableCell sx={{ display: "flex", zIndex: 99 }}>
                     <Button
