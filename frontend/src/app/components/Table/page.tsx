@@ -5,6 +5,7 @@ import Paper from "@mui/material/Paper";
 import {
   Box,
   Button,
+  Checkbox,
   FormControl,
   FormControlLabel,
   FormLabel,
@@ -24,19 +25,21 @@ import CustomModal from "../Modal/page";
 import AddFiche from "../AddFiche/page";
 import moment from "moment";
 
-export default function CustomTable({ rows, setReload, userList }: any) {
+const label = { inputProps: { "aria-label": "Checkbox demo" } };
+
+export default function CustomTable({ rows, setReload, userList, selectedRows,setSelectedRows, openAssign, setOpenAssign,filters}: any) {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [currentRow, setCurrentRow] = React.useState<any>({});
   const [openUpdateModal, setOpenUpdateModal] = React.useState<boolean>(false);
-  const [openAssign, setOpenAssign] = React.useState<boolean>(false);
   const [selectedUser, setSelectedUser] = React.useState<number>(0);
+  
 
   const handleDelete = React.useCallback(
     (event: any) => {
       event.preventDefault();
       const token = Cookies.get("auth-token");
 
-      fetch(`${process.env.NEXT_PUBLIC_URL || "http://localhost/api"}/api/fiches/` + currentRow?.id, {
+      fetch(`${process.env.NEXT_PUBLIC_URL}/api/fiches/` + currentRow?.id, {
         method: "DELETE",
         headers: {
           accept: "application/json",
@@ -61,10 +64,40 @@ export default function CustomTable({ rows, setReload, userList }: any) {
   };
 
   const handleAssign = React.useCallback(() => {
-    if (currentRow && selectedUser) {
+    console.log('filters',filters,selectedUser,selectedRows)
+
+    if(selectedRows.length){
+
+      console.log('filters 2',filters,selectedUser)
+
       const token = Cookies.get("auth-token");
 
-      fetch(`${process.env.NEXT_PUBLIC_URL || "http://localhost/api"}/api/fiches/${currentRow.id}`, {
+      Promise.all(selectedRows.map((row:string)=>{
+        fetch(`${process.env.NEXT_PUBLIC_URL}/api/fiches/${row}`, {
+          method: "PUT",
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+            accept: "application/json",
+            Authorization: "bearer " + token,
+          },
+          body: JSON.stringify({
+            data: {
+              userAssigne: selectedUser,
+            },
+          }),
+        });
+  
+       
+      })).then(()=>{
+        setReload((prev: any) => !prev);
+        setOpenAssign(false);
+      })
+    } else if (currentRow && selectedUser) {
+      console.log('filters 3',filters,selectedUser)
+
+      const token = Cookies.get("auth-token");
+
+      fetch(`${process.env.NEXT_PUBLIC_URL}/api/fiches/${currentRow.id}`, {
         method: "PUT",
         headers: {
           "Content-type": "application/json; charset=UTF-8",
@@ -81,7 +114,7 @@ export default function CustomTable({ rows, setReload, userList }: any) {
       setReload((prev: any) => !prev);
       setOpenAssign(false);
     }
-  }, [currentRow, selectedUser, setReload, setOpenAssign]);
+  }, [currentRow, selectedUser, setReload, setOpenAssign,selectedRows,filters]);
 
   return (
     <Box sx={{ height: "100%", width: "100%", mt: "50px", mb: "50px" }}>
@@ -142,6 +175,25 @@ export default function CustomTable({ rows, setReload, userList }: any) {
         <Table>
           <TableHead>
             <TableRow style={{ backgroundColor: "#1976d2" }}>
+              <TableCell onClick={() => {}}>
+                <Checkbox
+                  {...label}
+                  checked={rows.length === selectedRows.length || false}
+                  sx={{
+                    "&.Mui-checked": {
+                      color: "white",
+                    },
+                  }}
+                  onClick={() => {
+                    setSelectedRows((prev:any)=>{
+                      if(prev.length && prev.length === rows.length){
+                        return []
+                      }
+                      return rows.map((r:any)=>r.id)
+                    });
+                  }}
+                />
+              </TableCell>
               <TableCell
                 style={{
                   fontSize: "0.9rem",
@@ -340,6 +392,22 @@ export default function CustomTable({ rows, setReload, userList }: any) {
                     },
                   }}
                 >
+                  <TableCell>
+                    <Checkbox
+                      {...label}
+                      checked={selectedRows.includes(row.id) || false}
+                      onChange={() => {
+                        setCurrentRow(row);
+                        setSelectedRows((prev:any) => {
+                          const alreadyExists = prev.find((p:string) => p === row?.id);
+
+                          const result = prev.filter((p:string) => p !== row.id);
+                          if (!alreadyExists) result.push(row.id);
+                          return result;
+                        });
+                      }}
+                    />
+                  </TableCell>
                   <TableCell
                     onClick={() => {
                       setCurrentRow(row);
