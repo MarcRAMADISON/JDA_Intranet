@@ -83,7 +83,6 @@ export const extractValue = (data: any, keyWord: string) => {
 
 export const sortData=(data:any)=>{
   const priorites = ["Nouveau", "A rappeler","Injoignable","Ne répond pas","Hors cible","Ne plus appeler","Faux numéro","Vente OK"]; // Ordre de priorité pour les villes
-  console.log('data',data)
 const tableauTrie = data.sort((a:any, b:any) => {
   // Trouver les index des villes dans la liste des priorités
   const indexA = priorites.indexOf(a?.statut);
@@ -98,8 +97,7 @@ const tableauTrie = data.sort((a:any, b:any) => {
   if (indexA !== -1) return -1;
   if (indexB !== -1) return 1;
 
-  // Sinon, on les garde dans l'ordre alphabétique
-  return a.ville.localeCompare(b.ville);
+ 
 });
 
 
