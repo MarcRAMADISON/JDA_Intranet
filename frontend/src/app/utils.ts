@@ -133,6 +133,7 @@ export async function getData({
 
   let rows;
 
+  console.log('filters2',filters)
 
   if (filters?.statut && filters?.statut !== 'TOUT' && !isAll) {
     rows = await fetch(
@@ -152,7 +153,7 @@ export async function getData({
     );
   } else if (isAll && (!filters?.statut || filters?.statut === "TOUT")) {
     rows = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/api/fiches${query}populate=user,venduePar,userAssigne&pagination[limit]=999&sort=createdAt:desc`,
+      `${process.env.NEXT_PUBLIC_URL}/api/fiches${query}populate=user,venduePar,userAssigne&pagination[limit]=-1&sort=createdAt:desc`,
       {
         method: "GET",
         headers: {
@@ -164,7 +165,7 @@ export async function getData({
     );
   } else if (isAll && filters?.statut) {
     rows = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/api/fiches${query}filters[statut][$eq]=${filters?.statut}&populate=user,venduePar,userAssigne&pagination[limit]=999&sort=createdAt:desc`,
+      `${process.env.NEXT_PUBLIC_URL}/api/fiches${query}filters[statut][$eq]=${filters?.statut}&populate=user,venduePar,userAssigne&pagination[limit]=-1&sort=createdAt:desc`,
       {
         method: "GET",
         headers: {

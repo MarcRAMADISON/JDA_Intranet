@@ -121,7 +121,7 @@ function MenuBar({setReload}:any) {
 
       const token = Cookies.get("auth-token");
 
-      fetch(`${process.env.NEXT_PUBLIC_URL || "http://localhost/api"}/api/auth/change-password`, {
+      fetch(`${process.env.NEXT_PUBLIC_URL}/api/auth/change-password`, {
         method: "POST",
         headers: {
           "Content-type": "application/json; charset=UTF-8",
@@ -148,7 +148,7 @@ function MenuBar({setReload}:any) {
   }, [values.confirmPassword, values.newPassword, values.currentPassword]);
 
   return (
-    <AppBar sx={{ backgroundColor: "#000" }} position="static">
+    <AppBar sx={{ backgroundColor: "#384959" }} position="static">
       <Container maxWidth="xl">
         <CustomModal open={openModal} setOpen={setOpenModal}>
           <Typography
@@ -214,7 +214,7 @@ function MenuBar({setReload}:any) {
             sx={{
               display: { xs: "none", md: "flex" },
               width: "100px",
-              height: "30px",
+              height: "100px",
               position: "relative",
               mr: "50px",
             }}

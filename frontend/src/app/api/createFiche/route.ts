@@ -1,9 +1,9 @@
 import { NextRequest } from "next/server";
 
 // Fonction pour créer une réponse d'erreur uniforme
-const createErrorResponse = (message: string) => {
+const createErrorResponse = (message: string,type:string) => {
   return new Response(
-    JSON.stringify({ message, status: "500" }),
+    JSON.stringify({ message, status: "500",type:type }),
     {
       status: 500,
       headers: {
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     // Si une fiche existe déjà, renvoyer une erreur
     if (searchData?.data?.length) {
-      return createErrorResponse("La fiche existe déjà avec les mêmes numéros de téléphone");
+      return createErrorResponse("La fiche existe déjà avec les mêmes numéros de téléphone","ALREADY_EXISTS");
     } else {
       // Sinon, créer une nouvelle fiche
       const createResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/fiches`, {
@@ -89,11 +89,11 @@ export async function POST(request: NextRequest) {
         });
       } else {
         // En cas d'erreur lors de la création
-        return createErrorResponse("Erreur lors de la création de la fiche");
+        return createErrorResponse("Erreur lors de la création de la fiche","ERROR");
       }
     }
   } else {
     // Si les informations requises ne sont pas présentes
-    return createErrorResponse("Erreur lors de la création : informations manquantes");
+    return createErrorResponse("Erreur lors de la création : informations manquantes","ERROR");
   }
 }

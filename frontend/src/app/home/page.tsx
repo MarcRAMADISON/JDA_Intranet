@@ -65,7 +65,7 @@ function Home() {
   });
 
   useEffect(() => {
-    getData({ start: 20 * (currentPage - 1), limit: 20 })
+    getData({filters:filters, start: 20 * (currentPage - 1), limit: 20 })
       .then((res) => res.json())
       .then((res) => {
         const data = (res?.data || []).map((d: any) => ({
@@ -88,7 +88,7 @@ function Home() {
       .then((res) => {
         setUserList(res.filter((r: any) => r.id !== dataUser?.id));
       });
-  }, [reload, currentPage]);
+  }, [reload, currentPage,filters]);
 
   const handleOpenModal = useCallback(() => {
     setOpenModal(true);
