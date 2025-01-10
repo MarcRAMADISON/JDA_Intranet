@@ -128,7 +128,7 @@ export default function CustomTable({
       setReload((prev: any) => !prev);
       setOpenAssign(false);
     }
-  }, [selectedRows, currentRow, selectedUser, setSelectedRows, setReload, setOpenAssign]);
+  }, [selectedRows, currentRow, selectedUser, setLoading, setSelectedRows, setReload, setOpenAssign]);
 
   return (
     <Box sx={{ height: "60vh", width: "100%", mt: "50px", mb: "50px",overflow:'scroll' }}>
@@ -175,7 +175,7 @@ export default function CustomTable({
           color="primary"
           sx={{ mt: "30px" }}
           onClick={() => handleAssign()}
-          disabled={loading.assign && selectedRows.length}
+          disabled={loading?.assign && selectedRows?.length}
         >
           Confirmer
         </Button>
@@ -193,7 +193,7 @@ export default function CustomTable({
               <TableCell onClick={() => {}}>
                 <Checkbox
                   {...label}
-                  checked={rows.length === selectedRows.length || false}
+                  checked={rows?.length === selectedRows?.length || false}
                   sx={{
                     "&.Mui-checked": {
                       color: "white",
@@ -201,7 +201,7 @@ export default function CustomTable({
                   }}
                   onClick={() => {
                     setSelectedRows((prev: any) => {
-                      if (prev.length && prev.length === rows.length) {
+                      if (prev?.length && prev?.length === rows?.length) {
                         return [];
                       }
                       return rows.map((r: any) => ({
