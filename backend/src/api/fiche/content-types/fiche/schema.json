@@ -69,9 +69,5 @@
     "nbFollowers": {
       "type": "string"
     }
-  },
-  "config": {
-    "defaultLimit": 10000,
-    "maxLimit": -1
   }
 }
