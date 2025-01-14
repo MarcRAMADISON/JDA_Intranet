@@ -115,11 +115,13 @@ export async function getData({
   start,
   limit,
   isAll = false,
+  search
 }: {
   filters?: filterObject;
   start?: number;
   limit?: number;
   isAll?: boolean;
+  search?: string
 }) {
   const token = Cookies.get("auth-token");
   const user = Cookies.get("user");
@@ -133,7 +135,23 @@ export async function getData({
 
   let rows;
 
-  console.log('filters2',filters)
+  if(search){
+    rows = await fetch(
+      `${process.env.NEXT_PUBLIC_URL}/api/fiches${query}filters[$and][0][$or][0][telephoneStandard][$containsi]=${search}&filters[$and][0][$or][1][ligneDirecte][$containsi]=${search}&filters[$and][0][$or][2][etablissement][$containsi]=${search}&filters[$and][0][$or][3][localisation][$containsi]=${search}&pagination[start]=${start || 0}&pagination[limit]=${
+        limit || 20
+      }&populate=user,venduePar,userAssigne&sort=createdAt:desc`,
+      {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+          accept: "application/json",
+          Authorization: "bearer " + token,
+        },
+      }
+    );
+
+    return rows
+  }
 
   if (filters?.statut && filters?.statut !== 'TOUT' && !isAll) {
     rows = await fetch(

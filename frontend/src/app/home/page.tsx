@@ -8,6 +8,7 @@ import {
   MenuItem,
   Pagination,
   Select,
+  TextField,
   Typography,
 } from "@mui/material";
 import MenuBar from "../components/MenuBar/page";
@@ -15,7 +16,7 @@ import CustomTable from "../components/Table/page";
 import { useCallback, useEffect, useState } from "react";
 import AddFiche from "../components/AddFiche/page";
 import { getData, getUsers, handleExport, sortData } from "../utils";
-import { Delete, Download, Edit, Share } from "@mui/icons-material";
+import { Delete, Download, Edit, Search as SearchIcon, Share } from "@mui/icons-material";
 import Cookies from "js-cookie";
 import CustomModal from "../components/Modal/page";
 
@@ -54,6 +55,7 @@ function Home() {
   const [userList, setUserList] =
     useState<{ id: number; username: string; type: string }[]>();
   const [filters, setFilters] = useState<filterObject>(defaultFilter);
+  const [search,setSearch]= useState<string>('');
   const [selectedRows, setSelectedRows] = useState<selectedRowObject[]>([]);
   const [openAssign, setOpenAssign] = useState<boolean>(false);
   const [openChangeMultiple, setOpenChangeMultiple] = useState<boolean>(false);
@@ -65,7 +67,7 @@ function Home() {
   });
 
   useEffect(() => {
-    getData({filters:filters, start: 20 * (currentPage - 1), limit: 20 })
+    getData({search:search, filters:filters, start: 20 * (currentPage - 1), limit: 20 })
       .then((res) => res.json())
       .then((res) => {
         const data = (res?.data || []).map((d: any) => ({
@@ -88,7 +90,8 @@ function Home() {
       .then((res) => {
         setUserList(res.filter((r: any) => r.id !== dataUser?.id));
       });
-  }, [reload, currentPage,filters]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reload, currentPage, filters]);
 
   const handleOpenModal = useCallback(() => {
     setOpenModal(true);
@@ -98,6 +101,8 @@ function Home() {
     (event: any) => {
       event.preventDefault();
 
+      setSearch('')
+      setCurrentPage(1)
       setFilters((prev) => ({
         ...prev,
         [event.target.name]: event.target.value,
@@ -135,7 +140,7 @@ function Home() {
   const handleChangePagination = useCallback(
     (event: any, page: number) => {
       event.preventDefault();
-      getData({ filters, start: 20 * (page - 1), limit: 20 })
+      getData({ search, filters, start: 20 * (page - 1), limit: 20 })
         .then((res) => res.json())
         .then((res) => {
           const data = (res?.data || []).map((d: any) => ({
@@ -147,7 +152,7 @@ function Home() {
           setCurrentPage(page);
         });
     },
-    [filters]
+    [filters,search]
   );
 
   const handleExportAction = useCallback(
@@ -263,6 +268,38 @@ function Home() {
     [selectedRows]
   );
 
+  const handleSearch=useCallback(()=>{
+
+    if(search){
+      getData({ search,start: 0, limit: 20 })
+      .then((res) => res.json())
+      .then((res) => {
+        const data = (res?.data || []).map((d: any) => ({
+          id: d.id,
+          ...d.attributes,
+          total: res?.meta?.pagination?.total || 0,
+        }));
+        setFilters(defaultFilter);
+        setCurrentPage(1)
+        setRows(sortData(data));
+      });
+    }else{
+      getData({filters:filters, start: 20 * (currentPage - 1), limit: 20 })
+      .then((res) => res.json())
+      .then((res) => {
+        const data = (res?.data || []).map((d: any) => ({
+          id: d.id,
+          ...d.attributes,
+          total: res?.meta?.pagination?.total || 0,
+        }));
+        setRows(sortData(data));
+        setCurrentPage(1)
+      });
+    }
+    
+   
+  },[currentPage, filters, search])
+
   return (
     <Box
       sx={{
@@ -339,14 +376,29 @@ function Home() {
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: "repeat(4,1fr)",
-            gap: "20px",
+            gridTemplateColumns: "repeat(3,1fr)",
+            columnGap: "20px",
+            rowGap:'50px',
             mb: "10px",
           }}
         >
           <Button variant="contained" onClick={handleOpenModal}>
             Nouvelle fiche
           </Button>
+          <Button
+            startIcon={<Download />}
+            size="small"
+            onClick={handleExportAction}
+            variant="contained"
+          >
+            Exporter
+          </Button>
+          <Box sx={{display:'flex',height:"60px",width:"100%"}}>
+            <TextField id="outlined-basic" label="Téléphone / établissement / localisation" variant="outlined" value={search} onChange={(e)=>setSearch(e.target.value)} />
+            <Button sx={{height:"60px"}} variant='text' onClick={handleSearch}>
+              <SearchIcon/>
+            </Button>
+          </Box>
           <FormControl sx={{ minWidth: "250px" }}>
             <InputLabel id="demo-simple-select-label">
               Filtrer par statut
@@ -358,7 +410,6 @@ function Home() {
               name="statut"
               label="Type d'établissement"
               onChange={(e) => handleChangeFilter(e)}
-              sx={{ width: "90%", mb: "10px" }}
             >
               <MenuItem value="TOUT">Afficher tout</MenuItem>
               <MenuItem value="Nouveau">Nouveau</MenuItem>
@@ -372,7 +423,7 @@ function Home() {
             </Select>
           </FormControl>
           {userType === "ADMIN" && (
-            <FormControl sx={{ minWidth: "250px" }}>
+            <FormControl >
               <InputLabel id="demo-simple-select-label">
                 Filtrer par utilisateur
               </InputLabel>
@@ -383,7 +434,7 @@ function Home() {
                 name="userId"
                 label="Filtrer par utilisateur"
                 onChange={(e) => handleChangeFilter(e)}
-                sx={{ width: "90%", mb: "10px" }}
+                sx={{ width: "100%", mb: "10px" }}
               >
                 <MenuItem value={0}>Afficher tout</MenuItem>
                 {(userList || []).map((user, key) => {
@@ -396,15 +447,6 @@ function Home() {
               </Select>
             </FormControl>
           )}
-          <Button
-            sx={{ maxWidth: "120px" }}
-            startIcon={<Download />}
-            size="small"
-            onClick={handleExportAction}
-            variant="contained"
-          >
-            Exporter
-          </Button>
         </Box>
         {selectedRows.length ? (
           <Box
