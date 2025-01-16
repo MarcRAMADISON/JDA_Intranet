@@ -102,7 +102,7 @@ function CustomChart({
         scales: {
           y: {
             beginAtZero: true, // Démarre à 0 par défaut
-            max: data.length + 200, // Définit une valeur minimale personnalisée
+            max: Math.max(...(data || []).map((row) => row.nbFiche)) + 50, // Définit une valeur minimale personnalisée
           },
         },
         plugins: {

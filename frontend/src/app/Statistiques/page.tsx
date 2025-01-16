@@ -1,216 +1,70 @@
 "use client";
 
-import { Box, Button, TextField, Typography } from "@mui/material";
+import * as React from "react";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
+import GlobalStatistiques from "../components/GlobalStatistique/page";
 import MenuBar from "../components/MenuBar/page";
-import CustomChart from "../components/CustomChart/page";
-import { useEffect, useState } from "react";
-import { getAnnualStat, statuts } from "../utils";
-import { Search } from "@mui/icons-material";
+import IndividualStatistiques from "../components/IndividualStatistique/page";
 
-interface monthlyDataObject {
-  label: string;
-  nbFiche: number;
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
 }
 
-interface annuelDataObject {
-  data: monthlyDataObject[];
-  statut: { statut: string; nbFiche: number }[];
-  totalFicheAnnuel: number;
+function CustomTabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
 }
 
-function Statistiques() {
-  const [annuelData, setAnnuelData] = useState<annuelDataObject | undefined>();
-  const [detailStatut, setDetailStatut] = useState<any>();
-  const [search, setSearch] = useState<number>(new Date().getFullYear());
+function a11yProps(index: number) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
+  };
+}
 
-  useEffect(() => {
-    getAnnualStat({ year: new Date().getFullYear() }).then((res) => {
-      if (res) {
-        const data: monthlyDataObject[] = res.global.monthData.map((month) => ({
-          label: month.label,
-          nbFiche: month.nbFiche,
-        }));
+export default function Statistiques() {
+  const [value, setValue] = React.useState(0);
 
-        const detailData = statuts.map((s) => {
-          const data = res.global.monthData.map((month) => ({
-            label: month.label,
-            nbFiche: month.statuts.find((statut) => statut.statut === s)
-              ?.nbFiche,
-          }));
-
-          return { statut: s, data };
-        });
-        setDetailStatut(detailData);
-
-        setAnnuelData({
-          data: data,
-          statut: res?.global?.statuts,
-          totalFicheAnnuel: res?.global?.totalAnnuel,
-        });
-      }
-    });
-  }, []);
-
-  const handleSearch = () => {
-    setDetailStatut([]);
-    setAnnuelData({ data: [], statut: [], totalFicheAnnuel: 0 });
-
-    getAnnualStat({ year: search }).then((res) => {
-      if (res) {
-        const data: monthlyDataObject[] = res.global.monthData.map((month) => ({
-          label: month.label,
-          nbFiche: month.nbFiche,
-        }));
-
-        const detailData = statuts.map((s) => {
-          const data = res.global.monthData.map((month) => ({
-            label: month.label,
-            nbFiche: month.statuts.find((statut) => statut.statut === s)
-              ?.nbFiche,
-          }));
-
-          return { statut: s, data };
-        });
-        setDetailStatut(detailData);
-
-        setAnnuelData({
-          data: data,
-          statut: res?.global?.statuts,
-          totalFicheAnnuel: res?.global?.totalAnnuel,
-        });
-      }
-    });
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
   };
 
   return (
     <Box>
       <MenuBar />
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          width: "99%",
-          alignItems: "center",
-          mt: "50px",
-        }}
-      >
-        <Box sx={{ display: "flex", height: "100px", mb:'50px' }}>
-          <TextField
-            id="outlined-basic"
-            label="Année"
-            variant="outlined"
-            type="number"
-            value={search}
-            onChange={(e) => setSearch(e.target.value as unknown as number)}
-          />
-          <Button sx={{ height: "60px" }} variant="text" onClick={handleSearch}>
-            <Search />
-          </Button>
-        </Box>
-        <Typography color="primary" variant="h5" sx={{ fontWeight: "bold" }}>
-          Statistique globale annuelle
-        </Typography>
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: "60% 40%",
-            gap: "10px",
-            mt: "70px",
-            width: "60%",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
+      <Box sx={{ width: "90%",mt:'50px',placeSelf:"center" }}>
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            aria-label="basic tabs example"
           >
-            {annuelData?.totalFicheAnnuel ? (
-              <Box sx={{ display: "flex", alignItems: "center", mb: "20px" }}>
-                <Typography variant="body1" color="primary">
-                  Nombre total des fiches {search} :
-                </Typography>
-                <Typography
-                  sx={{ ml: "15px" }}
-                  variant="body2"
-                  color="text.secondary"
-                >
-                  {annuelData?.totalFicheAnnuel}
-                </Typography>
-              </Box>
-            ) : (
-              <></>
-            )}
-            <CustomChart type="line" data={annuelData?.data || []} />
-          </Box>
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2,1fr)",
-              columnGap: "10px",
-              rowGap: "20px",
-            }}
-          >
-            {annuelData?.statut.map((statut, index) => {
-              return (
-                <Box key={`statut-${index}`}>
-                  <Typography variant="body1" color="primary">
-                    {statut.statut}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {statut.nbFiche}
-                  </Typography>
-                </Box>
-              );
-            })}
-          </Box>
+            <Tab label="Statistiques globale" {...a11yProps(0)} />
+            <Tab label="Statistique individuelle" {...a11yProps(1)} />
+          </Tabs>
         </Box>
-        <Typography
-          color="primary"
-          variant="h5"
-          sx={{ mt: "100px", mb: "70px", fontWeight: "bold" }}
-        >
-          Détail statistique globale annuelle par statut
-        </Typography>
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2,1fr)",
-            columnGap: "10px",
-            rowGap: "20px",
-            width: "70%",
-          }}
-        >
-          {detailStatut?.length ? (
-            statuts.map((statut) => {
-              return (
-                <Box
-                  sx={{ display: "flex", flexDirection: "column" }}
-                  key={statut}
-                >
-                  <Box sx={{ mb: "20px" }}>
-                    <Typography variant="body1" color="primary">
-                      {statut}
-                    </Typography>
-                  </Box>
-                  <CustomChart
-                    data={
-                      (detailStatut || []).find(
-                        (detail: any) => detail.statut === statut
-                      ).data
-                    }
-                  />
-                </Box>
-              );
-            })
-          ) : (
-            <></>
-          )}
-        </Box>
+        <CustomTabPanel value={value} index={0}>
+          <GlobalStatistiques />
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={1}>
+          <IndividualStatistiques/>
+        </CustomTabPanel>
       </Box>
     </Box>
   );
 }
-
-export default Statistiques;

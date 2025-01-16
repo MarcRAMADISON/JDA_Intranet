@@ -1,9 +1,18 @@
 "use client";
 
-import { Box, Button, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
 import CustomChart from "../CustomChart/page";
-import { useEffect, useState } from "react";
-import { getAnnualStat, statuts } from "../../utils";
+import { useCallback, useEffect, useState } from "react";
+import { getAnnualStat, getUsers, statuts } from "../../utils";
 import { Search } from "@mui/icons-material";
 
 interface monthlyDataObject {
@@ -17,44 +26,67 @@ interface annuelDataObject {
   totalFicheAnnuel: number;
 }
 
-function GlobalStatistiques() {
+function IndividualStatistiques() {
   const [annuelData, setAnnuelData] = useState<annuelDataObject | undefined>();
   const [detailStatut, setDetailStatut] = useState<any>();
   const [search, setSearch] = useState<number>(new Date().getFullYear());
+  const [userList, setUserList] =
+    useState<{ id: number; username: string }[]>();
+  const [selectedUser, setSelectedUser] = useState<{ id: number }>({ id: 0 });
+
+  useEffect(()=>{
+    getUsers()
+    .then((res) => res.json())
+    .then((res) => {
+      setUserList(res);
+      setSelectedUser({id:res[0].id})
+    });
+  },[])
 
   useEffect(() => {
-    getAnnualStat({ year: new Date().getFullYear() }).then((res) => {
-      if (res) {
-        const data: monthlyDataObject[] = res.global.monthData.map((month) => ({
-          label: month.label,
-          nbFiche: month.nbFiche,
-        }));
 
-        const detailData = statuts.map((s) => {
-          const data = res.global.monthData.map((month) => ({
+    if(selectedUser.id){
+
+      getAnnualStat({ year: new Date().getFullYear(), idUser:selectedUser.id, type:'INDIVIDUAL' }).then((res) => {
+        if (res) {
+          const data: monthlyDataObject[] = res.global.monthData.map((month) => ({
             label: month.label,
-            nbFiche: month.statuts.find((statut) => statut.statut === s)
-              ?.nbFiche,
+            nbFiche: month.nbFiche,
           }));
+  
+          const detailData = statuts.map((s) => {
+            const data = res.global.monthData.map((month) => ({
+              label: month.label,
+              nbFiche: month.statuts.find((statut) => statut.statut === s)
+                ?.nbFiche,
+            }));
+  
+            return { statut: s, data };
+          });
+          setDetailStatut(detailData);
+  
+          setAnnuelData({
+            data: data,
+            statut: res?.global?.statuts,
+            totalFicheAnnuel: res?.global?.totalAnnuel,
+          });
+        }
+      });
 
-          return { statut: s, data };
-        });
-        setDetailStatut(detailData);
+    }
+   
 
-        setAnnuelData({
-          data: data,
-          statut: res?.global?.statuts,
-          totalFicheAnnuel: res?.global?.totalAnnuel,
-        });
-      }
-    });
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userList]);
 
-  const handleSearch = () => {
+
+  const handleSearch = useCallback(() => {
     setDetailStatut([]);
     setAnnuelData({ data: [], statut: [], totalFicheAnnuel: 0 });
 
-    getAnnualStat({ year: search }).then((res) => {
+    console.log('search data',detailStatut,annuelData,selectedUser.id)
+
+    getAnnualStat({ year: search, idUser: selectedUser.id, type: 'INDIVIDUAL' }).then((res) => {
       if (res) {
         const data: monthlyDataObject[] = res.global.monthData.map((month) => ({
           label: month.label,
@@ -79,7 +111,7 @@ function GlobalStatistiques() {
         });
       }
     });
-  };
+  },[annuelData, detailStatut, search, selectedUser.id]);
 
   return (
     <Box>
@@ -92,7 +124,7 @@ function GlobalStatistiques() {
           mt: "50px",
         }}
       >
-        <Box sx={{ display: "flex", height: "100px", mb:'50px' }}>
+        <Box sx={{ display: "flex", mb: "50px" }}>
           <TextField
             id="outlined-basic"
             label="Année"
@@ -101,12 +133,36 @@ function GlobalStatistiques() {
             value={search}
             onChange={(e) => setSearch(e.target.value as unknown as number)}
           />
+          <FormControl sx={{width:"200px",ml:"30px"}}>
+            <InputLabel id="demo-simple-select-label">
+              Filtrer par utilisateur
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={selectedUser?.id}
+              name="userId"
+              label="Filtrer par utilisateur"
+              onChange={(e) =>
+                setSelectedUser({ id: e.target.value as number })
+              }
+              sx={{ width: "100%", mb: "10px" }}
+            >
+              {(userList || []).map((user, key) => {
+                return (
+                  <MenuItem key={key} value={user.id}>
+                    {user.username}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
           <Button sx={{ height: "60px" }} variant="text" onClick={handleSearch}>
             <Search />
           </Button>
         </Box>
         <Typography color="primary" variant="h5" sx={{ fontWeight: "bold" }}>
-          Statistique globale annuelle
+          Statistique Individuelle annuelle
         </Typography>
         <Box
           sx={{
@@ -169,7 +225,7 @@ function GlobalStatistiques() {
           variant="h5"
           sx={{ mt: "100px", mb: "70px", fontWeight: "bold" }}
         >
-          Détail statistique globale annuelle par statut
+          Détail statistique Individuelle annuelle par statut
         </Typography>
         <Box
           sx={{
@@ -211,4 +267,4 @@ function GlobalStatistiques() {
   );
 }
 
-export default GlobalStatistiques;
+export default IndividualStatistiques;

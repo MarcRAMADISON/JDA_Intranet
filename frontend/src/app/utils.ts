@@ -5,28 +5,28 @@ import * as XLSX from "xlsx";
 export const setAuthCookie = ({
   cookies,
   user,
-  idEquipe
+  idEquipe,
 }: {
   cookies: string;
   user: string;
-  idEquipe: string
+  idEquipe: string;
 }) => {
   Cookies.set("auth-token", cookies, {
     expires: 1, // Durée en jours
     path: "/",
-    secure: false,//process.env.NODE_ENV === "production",
+    secure: false, //process.env.NODE_ENV === "production",
     sameSite: "strict",
   });
   Cookies.set("user", user, {
     expires: 1, // Durée en jours
     path: "/",
-    secure: false,//process.env.NODE_ENV === "production",
+    secure: false, //process.env.NODE_ENV === "production",
     sameSite: "strict",
   });
   Cookies.set("idEquipe", idEquipe, {
     expires: 1, // Durée en jours
     path: "/",
-    secure: false,//process.env.NODE_ENV === "production",
+    secure: false, //process.env.NODE_ENV === "production",
     sameSite: "strict",
   });
 };
@@ -82,29 +82,33 @@ export const extractValue = (data: any, keyWord: string) => {
   return keyFound ? data[keyFound] : undefined;
 };
 
-export const sortData=(data:any)=>{
-  const priorites = ["Nouveau", "A rappeler","Injoignable","Ne répond pas","Hors cible","Ne plus appeler","Faux numéro","Vente OK"]; // Ordre de priorité pour les villes
-const tableauTrie = data.sort((a:any, b:any) => {
-  const indexA = priorites.indexOf(a?.statut);
-  const indexB = priorites.indexOf(b?.statut);
+export const sortData = (data: any) => {
+  const priorites = [
+    "Nouveau",
+    "A rappeler",
+    "Injoignable",
+    "Ne répond pas",
+    "Hors cible",
+    "Ne plus appeler",
+    "Faux numéro",
+    "Vente OK",
+  ]; // Ordre de priorité pour les villes
+  const tableauTrie = data.sort((a: any, b: any) => {
+    const indexA = priorites.indexOf(a?.statut);
+    const indexB = priorites.indexOf(b?.statut);
 
-  if (indexA !== -1 && indexB !== -1) {
-    return indexA - indexB;
-  }
+    if (indexA !== -1 && indexB !== -1) {
+      return indexA - indexB;
+    }
 
-  if (indexA !== -1) return -1;
-  if (indexB !== -1) return 1;
+    if (indexA !== -1) return -1;
+    if (indexB !== -1) return 1;
 
+    return a?.statut && b?.statut && a?.statut.localeCompare(b?.statut);
+  });
 
-  return a?.statut && b?.statut && a?.statut.localeCompare(b?.statut);
-}
-);
-
-
-return tableauTrie;
-
-}
-
+  return tableauTrie;
+};
 
 interface filterObject {
   statut: string;
@@ -116,29 +120,36 @@ export async function getData({
   start,
   limit,
   isAll = false,
-  search
+  search,
 }: {
   filters?: filterObject;
   start?: number;
   limit?: number;
   isAll?: boolean;
-  search?: string
+  search?: string;
 }) {
   const token = Cookies.get("auth-token");
   const user = Cookies.get("user");
   const idEquipe = Cookies.get("idEquipe");
   const type = JSON.parse(user || "").type;
   const idUser = JSON.parse(user || "").id;
-  const query = (type === "ADMIN" && filters?.userId === 0) || (type === "ADMIN" && !filters?.userId) ? `?filters[user][equipe][$eq]=${idEquipe}&` : type === "ADMIN" && filters?.userId !== 0
-        ? `?filters[$or][0][user][$eq]=${filters?.userId}&filters[$or][1][userAssigne][$eq]=${filters?.userId}&`
+  const query =
+    (type === "ADMIN" && filters?.userId === 0) ||
+    (type === "ADMIN" && !filters?.userId)
+      ? `?filters[user][equipe][$eq]=${idEquipe}&`
+      : type === "ADMIN" && filters?.userId !== 0
+      ? `?filters[$or][0][user][$eq]=${filters?.userId}&filters[$or][1][userAssigne][$eq]=${filters?.userId}&`
       : `?filters[$or][0][user][$eq]=${idUser}&filters[$or][1][userAssigne][$eq]=${idUser}&`;
-
 
   let rows;
 
-  if(search){
+  if (search) {
     rows = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/api/fiches${query}filters[$and][0][$or][0][telephoneStandard][$containsi]=${search}&filters[$and][0][$or][1][ligneDirecte][$containsi]=${search}&filters[$and][0][$or][2][etablissement][$containsi]=${search}&filters[$and][0][$or][3][localisation][$containsi]=${search}&pagination[start]=${start || 0}&pagination[limit]=${
+      `${
+        process.env.NEXT_PUBLIC_URL
+      }/api/fiches${query}filters[$and][0][$or][0][telephoneStandard][$containsi]=${search}&filters[$and][0][$or][1][ligneDirecte][$containsi]=${search}&filters[$and][0][$or][2][etablissement][$containsi]=${search}&filters[$and][0][$or][3][localisation][$containsi]=${search}&pagination[start]=${
+        start || 0
+      }&pagination[limit]=${
         limit || 20
       }&populate=user,venduePar,userAssigne&sort=createdAt:desc`,
       {
@@ -151,10 +162,10 @@ export async function getData({
       }
     );
 
-    return rows
+    return rows;
   }
 
-  if (filters?.statut && filters?.statut !== 'TOUT' && !isAll) {
+  if (filters?.statut && filters?.statut !== "TOUT" && !isAll) {
     rows = await fetch(
       `${process.env.NEXT_PUBLIC_URL}/api/fiches${query}filters[statut][$eq]=${
         filters.statut
@@ -198,7 +209,9 @@ export async function getData({
     rows = await fetch(
       `${process.env.NEXT_PUBLIC_URL}/api/fiches${query}pagination[start]=${
         start || 0
-      }&pagination[limit]=${limit || 20}&populate=user,venduePar,userAssigne&sort=createdAt:desc`,
+      }&pagination[limit]=${
+        limit || 20
+      }&populate=user,venduePar,userAssigne&sort=createdAt:desc`,
       {
         method: "GET",
         headers: {
@@ -216,52 +229,9 @@ export async function getData({
 export const getUsers = async () => {
   const token = Cookies.get("auth-token");
   const idEquipe = Cookies.get("idEquipe");
-  
-    return fetch(
-      `${process.env.NEXT_PUBLIC_URL}/api/users?filters[equipe]=${idEquipe}&fields[0]=username&fields[1]=type`,
-      {
-        method: "GET",
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-          accept: "application/json",
-          Authorization: "bearer " + token,
-        },
-      }
-    );
- 
-};
-
-const months=[
-  {label:"Jan.",index:0},
-  {label:"Fev.",index:1},
-  {label:"Mar.",index:2},
-  {label:"Avr.",index:3},
-  {label:"Mai.",index:4},
-  {label:"Jui.",index:5},
-  {label:"Juil.",index:6},
-  {label:"Aoû.",index:7},
-  {label:"Sept.",index:8},
-  {label:'Oct.',index:9},
-  {label:"Nov.",index:10},
-  {label:"Dec.",index:11}
-];
-export const statuts=[
-  "Nouveau",
-  "Injoignable",
-  'Ne répond pas',
-  "A rappeler",
-  "Ne plus appeler",
-  "Hors cible",
-  "Faux numéro",
-  "Vente OK"
-]
-
-export const getAnnualStat=({year}:{year:number})=>{
-  const token = Cookies.get("auth-token");
-  const idEquipe = Cookies.get("idEquipe");
 
   return fetch(
-    `${process.env.NEXT_PUBLIC_URL}/api/fiches?filters[user][equipe][$eq]=${idEquipe}&filters[createdAt][$gte]=${year}-01-01&filters[createdAt][$lte]=${year}-12-31&pagination[limit]=-1`,
+    `${process.env.NEXT_PUBLIC_URL}/api/users?filters[equipe]=${idEquipe}&fields[0]=username&fields[1]=type`,
     {
       method: "GET",
       headers: {
@@ -270,49 +240,99 @@ export const getAnnualStat=({year}:{year:number})=>{
         Authorization: "bearer " + token,
       },
     }
-  ).then((res)=>res.json()).then((data)=>{
-    if(data?.data?.length){
-      const filtredData= months.map((month)=>{
+  );
+};
 
-        const monthlyData= (data.data || []).filter((d:any)=>{
-          return moment(d.attributes.createdAt).month() === month.index
+const months = [
+  { label: "Jan.", index: 0 },
+  { label: "Fev.", index: 1 },
+  { label: "Mar.", index: 2 },
+  { label: "Avr.", index: 3 },
+  { label: "Mai.", index: 4 },
+  { label: "Jui.", index: 5 },
+  { label: "Juil.", index: 6 },
+  { label: "Aoû.", index: 7 },
+  { label: "Sept.", index: 8 },
+  { label: "Oct.", index: 9 },
+  { label: "Nov.", index: 10 },
+  { label: "Dec.", index: 11 },
+];
+export const statuts = [
+  "Nouveau",
+  "Injoignable",
+  "Ne répond pas",
+  "A rappeler",
+  "Ne plus appeler",
+  "Hors cible",
+  "Faux numéro",
+  "Vente OK",
+];
+
+export const getAnnualStat = ({
+  year,
+  type,
+  idUser,
+}: {
+  year: number;
+  type?: string;
+  idUser?: number;
+}) => {
+  const token = Cookies.get("auth-token");
+  const idEquipe = Cookies.get("idEquipe");
+
+  const requestURL =
+    type === "INDIVIDUAL" && idUser
+      ? `${process.env.NEXT_PUBLIC_URL}/api/fiches?filters[user][$eq]=${idUser}&filters[createdAt][$gte]=${year}-01-01&filters[createdAt][$lte]=${year}-12-31&pagination[limit]=-1`
+      : `${process.env.NEXT_PUBLIC_URL}/api/fiches?filters[user][equipe][$eq]=${idEquipe}&filters[createdAt][$gte]=${year}-01-01&filters[createdAt][$lte]=${year}-12-31&pagination[limit]=-1`;
+
+  return fetch(requestURL, {
+    method: "GET",
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+      accept: "application/json",
+      Authorization: "bearer " + token,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data?.data?.length) {
+        const filtredData = months.map((month) => {
+          const monthlyData = (data.data || []).filter((d: any) => {
+            return moment(d.attributes.createdAt).month() === month.index;
+          });
+
+          const statutData = statuts.map((statut) => {
+            return {
+              statut,
+              nbFiche: (monthlyData || []).filter((d: any) => {
+                return d.attributes.statut === statut;
+              }).length,
+            };
+          });
+
+          return {
+            ...month,
+            nbFiche: monthlyData.length,
+            statuts: statutData,
+          };
         });
 
-        const statutData= statuts.map((statut)=>{
+        const filtredByStatut = statuts.map((statut) => {
           return {
             statut,
-            nbFiche: (monthlyData || []).filter((d:any)=>{
-              return d.attributes.statut === statut
-            }).length
-          }
-        })
+            nbFiche: (data.data || []).filter((d: any) => {
+              return d.attributes.statut === statut;
+            }).length,
+          };
+        });
 
         return {
-          ...month,
-          nbFiche: monthlyData.length,
-          statuts:statutData
-        }
-      })
-
-      const filtredByStatut= statuts.map((statut)=>{
-        return {
-          statut,
-          nbFiche: (data.data || []).filter((d:any)=>{
-            return d.attributes.statut === statut
-          }).length
-        }
-      })
-
-      return {
-        global: {
-        totalAnnuel: data.meta.pagination.total,
-        monthData: filtredData,
-        statuts: filtredByStatut
-      },
-    }
-    }
-  })
-
- 
-
-}
+          global: {
+            totalAnnuel: data.meta.pagination.total,
+            monthData: filtredData,
+            statuts: filtredByStatut,
+          },
+        };
+      }
+    });
+};
