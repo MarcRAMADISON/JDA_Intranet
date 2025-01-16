@@ -1,10 +1,11 @@
 "use client";
 
-import { Box, Typography } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import MenuBar from "../components/MenuBar/page";
 import CustomChart from "../components/CustomChart/page";
 import { useEffect, useState } from "react";
-import { getAnnualStat } from "../utils";
+import { getAnnualStat, statuts } from "../utils";
+import { Search } from "@mui/icons-material";
 
 interface monthlyDataObject {
   label: string;
@@ -19,15 +20,28 @@ interface annuelDataObject {
 
 function Statistiques() {
   const [annuelData, setAnnuelData] = useState<annuelDataObject | undefined>();
+  const [detailStatut, setDetailStatut] = useState<any>();
+  const [search, setSearch] = useState<number>(new Date().getFullYear());
 
   useEffect(() => {
-    getAnnualStat({ year: 2025 }).then((res) => {
+    getAnnualStat({ year: new Date().getFullYear() }).then((res) => {
       if (res) {
         const data: monthlyDataObject[] = res.global.monthData.map((month) => ({
           label: month.label,
           nbFiche: month.nbFiche,
         }));
-        console.log("res", res);
+
+        const detailData = statuts.map((s) => {
+          const data = res.global.monthData.map((month) => ({
+            label: month.label,
+            nbFiche: month.statuts.find((statut) => statut.statut === s)
+              ?.nbFiche,
+          }));
+
+          return { statut: s, data };
+        });
+        setDetailStatut(detailData);
+
         setAnnuelData({
           data: data,
           statut: res?.global?.statuts,
@@ -36,6 +50,37 @@ function Statistiques() {
       }
     });
   }, []);
+
+  const handleSearch = () => {
+    setDetailStatut([]);
+    setAnnuelData({ data: [], statut: [], totalFicheAnnuel: 0 });
+
+    getAnnualStat({ year: search }).then((res) => {
+      if (res) {
+        const data: monthlyDataObject[] = res.global.monthData.map((month) => ({
+          label: month.label,
+          nbFiche: month.nbFiche,
+        }));
+
+        const detailData = statuts.map((s) => {
+          const data = res.global.monthData.map((month) => ({
+            label: month.label,
+            nbFiche: month.statuts.find((statut) => statut.statut === s)
+              ?.nbFiche,
+          }));
+
+          return { statut: s, data };
+        });
+        setDetailStatut(detailData);
+
+        setAnnuelData({
+          data: data,
+          statut: res?.global?.statuts,
+          totalFicheAnnuel: res?.global?.totalAnnuel,
+        });
+      }
+    });
+  };
 
   return (
     <Box>
@@ -46,9 +91,22 @@ function Statistiques() {
           flexDirection: "column",
           width: "99%",
           alignItems: "center",
-          mt: "70px",
+          mt: "50px",
         }}
       >
+        <Box sx={{ display: "flex", height: "100px", mb:'50px' }}>
+          <TextField
+            id="outlined-basic"
+            label="Année"
+            variant="outlined"
+            type="number"
+            value={search}
+            onChange={(e) => setSearch(e.target.value as unknown as number)}
+          />
+          <Button sx={{ height: "60px" }} variant="text" onClick={handleSearch}>
+            <Search />
+          </Button>
+        </Box>
         <Typography color="primary" variant="h5" sx={{ fontWeight: "bold" }}>
           Statistique globale annuelle
         </Typography>
@@ -61,20 +119,30 @@ function Statistiques() {
             width: "60%",
           }}
         >
-          <Box sx={{display:'flex',flexDirection:"column",alignItems:'center'}}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
             {annuelData?.totalFicheAnnuel ? (
-                <Box sx={{display:'flex',alignItems:'center',mb:'20px'}}>
+              <Box sx={{ display: "flex", alignItems: "center", mb: "20px" }}>
                 <Typography variant="body1" color="primary">
-                  Nombre total des fiches 2025 : 
+                  Nombre total des fiches {search} :
                 </Typography>
-                <Typography sx={{ml:'15px'}} variant="body2" color="text.secondary">
-                {annuelData?.totalFicheAnnuel}
+                <Typography
+                  sx={{ ml: "15px" }}
+                  variant="body2"
+                  color="text.secondary"
+                >
+                  {annuelData?.totalFicheAnnuel}
                 </Typography>
               </Box>
             ) : (
               <></>
             )}
-            <CustomChart data={annuelData?.data || []} />
+            <CustomChart type="line" data={annuelData?.data || []} />
           </Box>
           <Box
             sx={{
@@ -97,6 +165,48 @@ function Statistiques() {
               );
             })}
           </Box>
+        </Box>
+        <Typography
+          color="primary"
+          variant="h5"
+          sx={{ mt: "100px", mb: "70px", fontWeight: "bold" }}
+        >
+          Détail statistique globale annuelle par statut
+        </Typography>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2,1fr)",
+            columnGap: "10px",
+            rowGap: "20px",
+            width: "70%",
+          }}
+        >
+          {detailStatut?.length ? (
+            statuts.map((statut) => {
+              return (
+                <Box
+                  sx={{ display: "flex", flexDirection: "column" }}
+                  key={statut}
+                >
+                  <Box sx={{ mb: "20px" }}>
+                    <Typography variant="body1" color="primary">
+                      {statut}
+                    </Typography>
+                  </Box>
+                  <CustomChart
+                    data={
+                      (detailStatut || []).find(
+                        (detail: any) => detail.statut === statut
+                      ).data
+                    }
+                  />
+                </Box>
+              );
+            })
+          ) : (
+            <></>
+          )}
         </Box>
       </Box>
     </Box>

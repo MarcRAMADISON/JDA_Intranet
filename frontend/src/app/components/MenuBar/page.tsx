@@ -60,7 +60,7 @@ function MenuBar({setReload}:any) {
 
   React.useEffect(() => {
     const data = Cookies.get("user");
-    const user = JSON.parse(data || "");
+    const user = data && JSON.parse(data || "");
 
     setUserData(user);
   }, []);

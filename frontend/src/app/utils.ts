@@ -245,7 +245,7 @@ const months=[
   {label:"Nov.",index:10},
   {label:"Dec.",index:11}
 ];
-const statuts=[
+export const statuts=[
   "Nouveau",
   "Injoignable",
   'Ne répond pas',
@@ -271,7 +271,7 @@ export const getAnnualStat=({year}:{year:number})=>{
       },
     }
   ).then((res)=>res.json()).then((data)=>{
-    if(data.data.length){
+    if(data?.data?.length){
       const filtredData= months.map((month)=>{
 
         const monthlyData= (data.data || []).filter((d:any)=>{
