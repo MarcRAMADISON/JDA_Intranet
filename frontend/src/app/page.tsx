@@ -62,7 +62,7 @@ export default function Login() {
                   user: JSON.stringify(res?.user),
                   idEquipe: idEquipe,
                 });
-                route.push("/home");
+                route.push("/Fiches");
               })
               .catch(() => setShowError(true));
           } else {

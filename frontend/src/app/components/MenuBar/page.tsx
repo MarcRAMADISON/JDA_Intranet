@@ -20,7 +20,7 @@ import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import ExcelFileUploader from "@/app/ExcelFileUploader/page";
 
-const pages = ["Fiche"];
+const pages = ["Fiches",'Statistiques'];
 const settings = [
   "Importer un fichier excel",
   "Changer mot de passe",
@@ -54,6 +54,7 @@ function MenuBar({setReload}:any) {
   >("HIDE");
   const [userData, setUserData] = React.useState<any>();
   const [disabled,setDisabled]= React.useState<boolean>(false)
+  const router=useRouter()
 
   const route = useRouter();
 
@@ -146,6 +147,10 @@ function MenuBar({setReload}:any) {
         .catch(() => setShowError("ERROR"));
     }
   }, [values.confirmPassword, values.newPassword, values.currentPassword]);
+
+  const handleChangeOnglet=React.useCallback((page:string)=>{
+    router.push(page)
+  },[router])
 
   return (
     <AppBar sx={{ backgroundColor: "#384959" }} position="static">
@@ -254,7 +259,7 @@ function MenuBar({setReload}:any) {
               sx={{ display: { xs: "block", md: "none" } }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                <MenuItem key={page} onClick={()=>handleChangeOnglet(page)}>
                   <Typography sx={{ textAlign: "center" }}>{page}</Typography>
                 </MenuItem>
               ))}
@@ -280,7 +285,7 @@ function MenuBar({setReload}:any) {
             {pages.map((page) => (
               <Button
                 key={page}
-                onClick={handleCloseNavMenu}
+                onClick={()=>handleChangeOnglet(page)}
                 sx={{ my: 2, color: "white", display: "block" }}
               >
                 {page}

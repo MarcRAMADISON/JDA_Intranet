@@ -46,7 +46,7 @@ const defaultFilter = {
   multiSelectStatut: "Nouveau",
 };
 
-function Home() {
+function Fiches() {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [reload, setReload] = useState<boolean>(false);
   const [rows, setRows] = useState<any>([]);
@@ -537,4 +537,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Fiches;

@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+import moment from "moment";
 import * as XLSX from "xlsx";
 
 export const setAuthCookie = ({
@@ -229,3 +230,89 @@ export const getUsers = async () => {
     );
  
 };
+
+const months=[
+  {label:"Jan.",index:0},
+  {label:"Fev.",index:1},
+  {label:"Mar.",index:2},
+  {label:"Avr.",index:3},
+  {label:"Mai.",index:4},
+  {label:"Jui.",index:5},
+  {label:"Juil.",index:6},
+  {label:"Aoû.",index:7},
+  {label:"Sept.",index:8},
+  {label:'Oct.',index:9},
+  {label:"Nov.",index:10},
+  {label:"Dec.",index:11}
+];
+const statuts=[
+  "Nouveau",
+  "Injoignable",
+  'Ne répond pas',
+  "A rappeler",
+  "Ne plus appeler",
+  "Hors cible",
+  "Faux numéro",
+  "Vente OK"
+]
+
+export const getAnnualStat=({year}:{year:number})=>{
+  const token = Cookies.get("auth-token");
+  const idEquipe = Cookies.get("idEquipe");
+
+  return fetch(
+    `${process.env.NEXT_PUBLIC_URL}/api/fiches?filters[user][equipe][$eq]=${idEquipe}&filters[createdAt][$gte]=${year}-01-01&filters[createdAt][$lte]=${year}-12-31&pagination[limit]=-1`,
+    {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+        accept: "application/json",
+        Authorization: "bearer " + token,
+      },
+    }
+  ).then((res)=>res.json()).then((data)=>{
+    if(data.data.length){
+      const filtredData= months.map((month)=>{
+
+        const monthlyData= (data.data || []).filter((d:any)=>{
+          return moment(d.attributes.createdAt).month() === month.index
+        });
+
+        const statutData= statuts.map((statut)=>{
+          return {
+            statut,
+            nbFiche: (monthlyData || []).filter((d:any)=>{
+              return d.attributes.statut === statut
+            }).length
+          }
+        })
+
+        return {
+          ...month,
+          nbFiche: monthlyData.length,
+          statuts:statutData
+        }
+      })
+
+      const filtredByStatut= statuts.map((statut)=>{
+        return {
+          statut,
+          nbFiche: (data.data || []).filter((d:any)=>{
+            return d.attributes.statut === statut
+          }).length
+        }
+      })
+
+      return {
+        global: {
+        totalAnnuel: data.meta.pagination.total,
+        monthData: filtredData,
+        statuts: filtredByStatut
+      },
+    }
+    }
+  })
+
+ 
+
+}

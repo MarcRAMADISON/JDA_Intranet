@@ -178,6 +178,12 @@ function AddFiche({
     }
   };
 
+  const validateEmail=useCallback((email:string)=>{
+    const pattern=/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    return pattern.test(email)
+  },[])
+
   return (
     <CustomModal
       style={{ width: "600px", height: "fit-content" }}
@@ -291,6 +297,7 @@ function AddFiche({
           label="Adresse e-mail"
           variant="standard"
           onChange={handleChange}
+          color={values.email && !validateEmail(values.email)? "error" : undefined}
         />
         <TextField
           value={values.reseauxSociaux}
