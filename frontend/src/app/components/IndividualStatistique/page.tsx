@@ -161,6 +161,7 @@ function IndividualStatistiques() {
             <Search />
           </Button>
         </Box>
+        { annuelData?.data?.length ?<>
         <Typography color="primary" variant="h5" sx={{ fontWeight: "bold" }}>
           Statistique Individuelle annuelle
         </Typography>
@@ -261,7 +262,7 @@ function IndividualStatistiques() {
           ) : (
             <></>
           )}
-        </Box>
+        </Box></> : <Typography variant='body1' color='text.secondary'>L&apos;utilisateur n&apos;a pas encore créée de fiche pour le moment</Typography>}
       </Box>
     </Box>
   );
