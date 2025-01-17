@@ -203,12 +203,15 @@ function Fiches() {
     [filters]
   );
 
-  const handleChangeStatutMultiRows = useCallback(() => {
+  const handleChangeStatutMultiRows = useCallback((e:any) => {
+    e.preventDefault()
 
     setLoading((prev)=>({...prev,change:true}))
 
     if (selectedRows.length && filters.multiSelectStatut) {
       const token = Cookies.get("auth-token");
+      const user = Cookies.get("user");
+      const dataUser = user && JSON.parse(user);
 
       Promise.all(
         selectedRows.map(async (row) => {
@@ -222,6 +225,7 @@ function Fiches() {
             body: JSON.stringify({
               data: {
                 statut: filters.multiSelectStatut,
+                venduePar: filters.multiSelectStatut ==='Vente OK' ? dataUser.id : null
               },
             }),
           });

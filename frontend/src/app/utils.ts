@@ -311,8 +311,6 @@ export const getAnnualStat = ({
             }
          })
 
-         console.log('d?.attributes?.venduePar?.data',filtredMonthlyData.length,monthlyData.length)
-
           const statutData = statuts.map((statut) => {
             return {
               statut,
