@@ -14,6 +14,7 @@ import CustomChart from "../CustomChart/page";
 import { useCallback, useEffect, useState } from "react";
 import { getAnnualStat, getUsers, statuts } from "../../utils";
 import { Search } from "@mui/icons-material";
+import Cookies from "js-cookie";
 
 interface monthlyDataObject {
   label: string;
@@ -38,8 +39,21 @@ function IndividualStatistiques() {
     getUsers()
     .then((res) => res.json())
     .then((res) => {
-      setUserList(res);
-      setSelectedUser({id:res[0].id})
+      const user = Cookies.get("user");
+      const dataUser = user && JSON.parse(user);
+
+      const filtredUsers= res.filter((r:any)=>r.id === dataUser.id)
+
+      if(dataUser.type === 'ADMIN'){
+        setUserList(res)
+        setSelectedUser({id:res[0].id})
+      }else{
+        setUserList(filtredUsers)
+        setSelectedUser({id:filtredUsers[0].id})
+      }
+
+      
+      
     });
   },[])
 
@@ -84,8 +98,6 @@ function IndividualStatistiques() {
     setDetailStatut([]);
     setAnnuelData({ data: [], statut: [], totalFicheAnnuel: 0 });
 
-    console.log('search data',detailStatut,annuelData,selectedUser.id)
-
     getAnnualStat({ year: search, idUser: selectedUser.id, type: 'INDIVIDUAL' }).then((res) => {
       if (res) {
         const data: monthlyDataObject[] = res.global.monthData.map((month) => ({
@@ -111,7 +123,7 @@ function IndividualStatistiques() {
         });
       }
     });
-  },[annuelData, detailStatut, search, selectedUser.id]);
+  },[search, selectedUser.id]);
 
   return (
     <Box>

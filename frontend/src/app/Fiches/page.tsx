@@ -502,7 +502,7 @@ function Fiches() {
           <></>
         )}
 
-        <CustomTable
+        {rows?.length ? <><CustomTable
           rows={rows}
           setReload={setReload}
           userList={userList}
@@ -531,7 +531,9 @@ function Fiches() {
           <Typography variant="body1" sx={{ mt: "30px" }}>
             Nombre total des fiches : {rows[0]?.total || 0}
           </Typography>
-        </Box>
+        </Box></> : <Typography sx={{placeSelf:"center", mt:'100px'}}variant="body1" color="text.secondary">
+            Aucune fiche n&apos;a encore été créée pour le moment.
+          </Typography>}
       </Box>
     </Box>
   );

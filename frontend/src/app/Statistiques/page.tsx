@@ -7,6 +7,7 @@ import Box from "@mui/material/Box";
 import GlobalStatistiques from "../components/GlobalStatistique/page";
 import MenuBar from "../components/MenuBar/page";
 import IndividualStatistiques from "../components/IndividualStatistique/page";
+import Cookies from "js-cookie";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -39,6 +40,16 @@ function a11yProps(index: number) {
 
 export default function Statistiques() {
   const [value, setValue] = React.useState(0);
+  const [userType, setUserType] = React.useState<string>();
+
+  React.useEffect(() => {
+    const user = Cookies.get("user");
+    const dataUser = user && JSON.parse(user);
+
+    if (dataUser?.type === "ADMIN") {
+      setUserType("ADMIN");
+    }
+  }, []);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -47,23 +58,23 @@ export default function Statistiques() {
   return (
     <Box>
       <MenuBar />
-      <Box sx={{ width: "90%",mt:'50px',placeSelf:"center" }}>
+      <Box sx={{ width: "90%", mt: "50px", placeSelf: "center" }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs
             value={value}
             onChange={handleChange}
             aria-label="basic tabs example"
           >
-            <Tab label="Statistiques globale" {...a11yProps(0)} />
-            <Tab label="Statistique individuelle" {...a11yProps(1)} />
+            <Tab label="Statistique individuelle" {...a11yProps(0)} />
+            <Tab label="Statistiques globale" {...a11yProps(1)} disabled={userType !== 'ADMIN'}/>
           </Tabs>
         </Box>
         <CustomTabPanel value={value} index={0}>
-          <GlobalStatistiques />
+          <IndividualStatistiques />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
-          <IndividualStatistiques/>
-        </CustomTabPanel>
+            <GlobalStatistiques />
+          </CustomTabPanel>
       </Box>
     </Box>
   );
