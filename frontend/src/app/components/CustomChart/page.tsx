@@ -1,71 +1,16 @@
 "use client";
 
-/*import { Box } from "@mui/material";
-import Chart from "chart.js/auto";
-import { useEffect } from "react";
-
-
-function CustomChart({data}:{data:{label:string,nbFiche:number}[]}) {
-  useEffect(() => {
-    const element = document.getElementById("dimensions");
-
-      const chart= new Chart(element as any, {
-        type: "bar",
-        data: {
-          labels: (data || []).map((row:any) => row.label),
-          datasets: [
-            {
-              label: "Nombre de fiche",
-              data: (data || []).map((row:any) => row.nbFiche),
-              borderColor: '#000',
-              backgroundColor: '#384959',
-            },
-          ],
-        },
-        options: {
-          plugins: {
-            legend: {
-              display: false,
-            },
-          },
-        },
-      });
-
-      
-    if (chart) {
-      chart.destroy(); // Détruisez l'ancien graphique
-    }
-    
-
-    return ()=>{
-      return chart.destroy()
-    }
-  });
-
-  return (
-    <Box>
-      <Box sx={{ width: "500px" }}>
-        <canvas id="dimensions"></canvas>
-      </Box>
-    </Box>
-  );
-}
-
-export default CustomChart;*/
-
-"use client";
-
 import { Box } from "@mui/material";
 import Chart from "chart.js/auto";
 import { useEffect, useRef } from "react";
 
-interface CustomChartProps {
-  type?: "bar" | "line" | "pie" | "doughnut" | "radar"; 
+/*interface CustomChartProps {
   data: { label: string; nbFiche: number }[]; 
+  type?: "bar" | "line" | "pie" | "doughnut" | "radar";
   options?: any; 
   width?: string | number; 
   height?: string | number; 
-}
+}*/
 
 function CustomChart({
   type = "bar",
@@ -73,7 +18,7 @@ function CustomChart({
   options = {},
   width = "500px",
   height = "300px",
-}: CustomChartProps) {
+}: any) {
   const chartRef = useRef<HTMLCanvasElement | null>(null);
   const chartInstance = useRef<Chart | null>(null); 
 
@@ -87,11 +32,11 @@ function CustomChart({
     chartInstance.current = new Chart(ctx as HTMLCanvasElement, {
       type,
       data: {
-        labels: (data || []).map((row) => row.label),
+        labels: (data || []).map((row:any) => row.label),
         datasets: [
           {
             label: "Nombre de fiche",
-            data: (data || []).map((row) => row.nbFiche),
+            data: (data || []).map((row:any) => row.nbFiche),
             borderColor: "#000",
             backgroundColor: "#384959",
           },
@@ -102,7 +47,7 @@ function CustomChart({
         scales: {
           y: {
             beginAtZero: true, // Démarre à 0 par défaut
-            max: Math.max(...(data || []).map((row) => row.nbFiche)) + 50, // Définit une valeur minimale personnalisée
+            max: Math.max(...(data || []).map((row:any) => row.nbFiche)) + 50, // Définit une valeur minimale personnalisée
           },
         },
         plugins: {
