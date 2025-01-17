@@ -63,6 +63,9 @@ function IndividualStatistiques() {
 
       getAnnualStat({ year: new Date().getFullYear(), idUser:selectedUser.id, type:'INDIVIDUAL' }).then((res) => {
         if (res) {
+
+          
+
           const data: monthlyDataObject[] = res.global.monthData.map((month) => ({
             label: month.label,
             nbFiche: month.nbFiche,

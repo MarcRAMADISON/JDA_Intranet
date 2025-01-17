@@ -282,7 +282,7 @@ export const getAnnualStat = ({
 
   const requestURL =
     type === "INDIVIDUAL" && idUser
-      ? `${process.env.NEXT_PUBLIC_URL}/api/fiches?filters[user][$eq]=${idUser}&filters[createdAt][$gte]=${year}-01-01&filters[createdAt][$lte]=${year}-12-31&pagination[limit]=-1`
+      ? `${process.env.NEXT_PUBLIC_URL}/api/fiches?filters[$or][0][user][$eq]=${idUser}&filters[$or][1][userAssigne][$eq]=${idUser}&filters[$or][2][venduePar][$eq]=${idUser}&filters[createdAt][$gte]=${year}-01-01&filters[createdAt][$lte]=${year}-12-31&pagination[limit]=-1&populate=user,venduePar,userAssigne`
       : `${process.env.NEXT_PUBLIC_URL}/api/fiches?filters[user][equipe][$eq]=${idEquipe}&filters[createdAt][$gte]=${year}-01-01&filters[createdAt][$lte]=${year}-12-31&pagination[limit]=-1`;
 
   return fetch(requestURL, {
@@ -301,10 +301,22 @@ export const getAnnualStat = ({
             return moment(d.attributes.createdAt).month() === month.index;
           });
 
+          const filtredMonthlyData= (monthlyData || []).filter((d: any) => {
+            if(d?.attributes?.venduePar?.data){
+              return d?.attributes?.venduePar?.data?.id === idUser
+            }else if(d?.attributes?.userAssigne?.data){
+              return d?.attributes?.userAssigne?.data?.id === idUser
+            }else {
+              return true;
+            }
+         })
+
+         console.log('d?.attributes?.venduePar?.data',filtredMonthlyData.length,monthlyData.length)
+
           const statutData = statuts.map((statut) => {
             return {
               statut,
-              nbFiche: (monthlyData || []).filter((d: any) => {
+              nbFiche: (filtredMonthlyData || []).filter((d: any) => {
                 return d.attributes.statut === statut;
               }).length,
             };
@@ -312,15 +324,25 @@ export const getAnnualStat = ({
 
           return {
             ...month,
-            nbFiche: monthlyData.length,
+            nbFiche: filtredMonthlyData.length,
             statuts: statutData,
           };
         });
 
+        const filtredGlobalData= (data.data || []).filter((d: any) => {
+          if(d?.attributes?.venduePar?.data){
+            return d?.attributes?.venduePar?.data?.id === idUser
+          }else if(d?.attributes?.userAssigne?.data){
+            return d?.attributes?.userAssigne?.data?.id === idUser
+          }else{
+            return true
+          } 
+       })
+
         const filtredByStatut = statuts.map((statut) => {
           return {
             statut,
-            nbFiche: (data.data || []).filter((d: any) => {
+            nbFiche: (filtredGlobalData || []).filter((d: any) => {
               return d.attributes.statut === statut;
             }).length,
           };
@@ -328,7 +350,7 @@ export const getAnnualStat = ({
 
         return {
           global: {
-            totalAnnuel: data.meta.pagination.total,
+            totalAnnuel: filtredGlobalData.length,
             monthData: filtredData,
             statuts: filtredByStatut,
           },
