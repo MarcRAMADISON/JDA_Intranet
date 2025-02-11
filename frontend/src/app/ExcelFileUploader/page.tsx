@@ -112,10 +112,10 @@ const ExcelFileUploader = () => {
     <Box
       sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
-      <Typography sx={{ mb: "20px" }} variant="h5">
+      <Typography sx={{ mb: "20px",color:'#000',fontSize:'bold' }} variant="h5">
         Importer un fichier Excel
       </Typography>
-      <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
+      <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} style={{color:'#000'}} />
       {data.length > 0 && (
         <>
           <Button

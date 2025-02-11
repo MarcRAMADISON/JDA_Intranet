@@ -133,7 +133,7 @@ export default function CustomTable({
   return (
     <Box sx={{ height: "60vh", width: "100%", mt: "50px", mb: "50px",overflow:'scroll' }}>
       <CustomModal open={openModal} setOpen={setOpenModal}>
-        <Typography>Voulez-vous vraiment supprimer cette fiche?</Typography>
+        <Typography sx={{color:'#000',fontSize:"bold"}}>Voulez-vous vraiment supprimer cette fiche?</Typography>
         <Button
           variant="contained"
           color="error"
@@ -144,7 +144,7 @@ export default function CustomTable({
         </Button>
       </CustomModal>
       <CustomModal open={openAssign} setOpen={setOpenAssign}>
-        <Typography variant="body1" sx={{ textAlign: "center", mb: "30px" }}>
+        <Typography variant="body1" sx={{ textAlign: "center", mb: "30px", color:'#000' }}>
           Assigner la fiche à une autre personne de votre groupe
         </Typography>
         <FormControl>
@@ -161,9 +161,10 @@ export default function CustomTable({
               return (
                 <FormControlLabel
                   value={user.id}
-                  control={<Radio />}
+                  control={<Radio sx={{ color: "default" }}/>}
                   label={user.username}
                   key={index}
+                  sx={{ color: "#000" }}
                 />
               );
             })}

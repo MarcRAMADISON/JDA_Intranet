@@ -157,7 +157,7 @@ function MenuBar({setReload}:any) {
       <Container maxWidth="xl">
         <CustomModal open={openModal} setOpen={setOpenModal}>
           <Typography
-            sx={{ mb: "30px" }}
+            sx={{ mb: "30px",color:'#000' }}
             id="modal-modal-title"
             variant="h6"
             component="h2"

@@ -315,7 +315,7 @@ function Fiches() {
     >
       <MenuBar setReload={setReload} />
       <CustomModal open={openModalDelete} setOpen={setOpenModalDelete}>
-        <Typography>Voulez-vous vraiment supprimer cette fiche?</Typography>
+        <Typography sx={{color:'#000',fontSize:'bold'}}>Voulez-vous vraiment supprimer cette fiche?</Typography>
         <Button
           variant="contained"
           color="error"
