@@ -35,7 +35,7 @@ export default function CustomTable({
   setSelectedRows,
   openAssign,
   setOpenAssign,
-  loading,
+  //loading,
   setLoading
 }: any) {
   const [openModal, setOpenModal] = React.useState<boolean>(false);
@@ -105,7 +105,7 @@ export default function CustomTable({
         setSelectedRows([])
         setReload((prev: any) => !prev);
         setOpenAssign(false);
-        setLoading((prev: any)=>({...prev,delete:false}))
+        setLoading((prev: any)=>({...prev,assign:true, delete:false}))
 
       });
     } else if (currentRow && selectedUser) {
@@ -176,7 +176,7 @@ export default function CustomTable({
           color="primary"
           sx={{ mt: "30px" }}
           onClick={() => handleAssign()}
-          disabled={loading?.assign && selectedRows?.length}
+          //disabled={loading?.assign && selectedRows?.length}
         >
           Confirmer
         </Button>
