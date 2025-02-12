@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ChangeEvent, useCallback, useState } from "react";
 import { setAuthCookie } from "./utils";
 import { useRouter } from "next/navigation";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const paperStyle = {
   width: "400px",
@@ -27,7 +28,7 @@ export default function Login() {
   });
   const [showError, setShowError] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
-
+  const [showMdp, setShowMdp] = useState<boolean>(false);
 
   const handleConnect = useCallback(() => {
     if (values.identifier && values.password) {
@@ -48,12 +49,15 @@ export default function Login() {
         .then((res) => {
           setDisabled(false);
           if (res.status === 200 || res?.jwt) {
-            return fetch(`${process.env.NEXT_PUBLIC_URL}/api/users/me?populate=equipe`, {
-              method: "GET",
-              headers: {
-                Authorization: "Bearer " + res?.jwt,
-              },
-            })
+            return fetch(
+              `${process.env.NEXT_PUBLIC_URL}/api/users/me?populate=equipe`,
+              {
+                method: "GET",
+                headers: {
+                  Authorization: "Bearer " + res?.jwt,
+                },
+              }
+            )
               .then((response) => response.json())
               .then((data) => {
                 const idEquipe = data?.equipe?.id;
@@ -102,11 +106,20 @@ export default function Login() {
         {showError && (
           <Alert severity="error">Mot de passe ou login invalides</Alert>
         )}
-        <Box sx={{ width: "70%", height: "130px", position: "relative",placeSelf:"center",mt:"-30px" }}>
+        <Box
+          sx={{
+            width: "70%",
+            height: "130px",
+            position: "relative",
+            placeSelf: "center",
+            mt: "-30px",
+          }}
+        >
           <Image
             src="/assets/logo-removebg-preview.png"
             alt="JDA logo"
             layout="fill"
+            objectFit="cover"
           />
         </Box>
         <Box
@@ -114,27 +127,36 @@ export default function Login() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            mt:"-50px"
+            mt: "-50px",
           }}
         >
           <TextField
             value={values.identifier}
             name="identifier"
-            sx={{ width: "90%",height:"70px" }}
+            sx={{ width: "90%", height: "70px" }}
             id="filled-basic"
             label="Login"
             variant="standard"
             onChange={handleChange}
           />
-          <TextField
-            value={values.password}
-            name="password"
-            sx={{ width: "90%", marginTop: "0px" }}
-            id="filled-basic"
-            label="Mot de passe"
-            variant="standard"
-            onChange={handleChange}
-          />
+          <Box sx={{ display: "flex", width: "90%", marginTop: "10px",position:'relative' }}>
+            <TextField
+              value={values.password}
+              name="password"
+              id="filled-basic"
+              label="Mot de passe"
+              variant="standard"
+              onChange={handleChange}
+              type={showMdp ? "text" : "password"}
+              sx={{ width: "100%" }}
+            />
+            <Button
+              sx={{position:'absolute',right:'0px',top:'7px'}}
+              onClick={() => setShowMdp((prev) => !prev)}
+            >
+              {showMdp ? <VisibilityOff /> : <Visibility />}
+            </Button>
+          </Box>
         </Box>
         <Button
           disabled={!values.identifier || !values.password || disabled}
