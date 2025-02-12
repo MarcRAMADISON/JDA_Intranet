@@ -14,13 +14,19 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import Image from "next/image";
 import CustomModal from "../Modal/page";
-import { Alert, TextField } from "@mui/material";
-import { Check, MenuOpen, Person2 } from "@mui/icons-material";
+import { Alert, TextField, useScrollTrigger } from "@mui/material";
+import {
+  Check,
+  MenuOpen,
+  Person2,
+  Visibility,
+  VisibilityOff,
+} from "@mui/icons-material";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import ExcelFileUploader from "@/app/ExcelFileUploader/page";
 
-const pages = ["Fiches",'Statistiques'];
+const pages = ["Fiches", "Statistiques"];
 const settings = [
   "Importer un fichier excel",
   "Changer mot de passe",
@@ -39,7 +45,7 @@ const defaultValues = {
   currentPassword: "",
 };
 
-function MenuBar({setReload}:any) {
+function MenuBar({ setReload }: any) {
   const [values, setValues] = React.useState<changePwdType>(defaultValues);
   const [openModal, setOpenModal] = React.useState<boolean>(false);
   const [openModalUpload, setOpenModalUpload] = React.useState<boolean>(false);
@@ -53,8 +59,13 @@ function MenuBar({setReload}:any) {
     "ERROR" | "SUCCESS" | "HIDE" | "NOT_MATCH"
   >("HIDE");
   const [userData, setUserData] = React.useState<any>();
-  const [disabled,setDisabled]= React.useState<boolean>(false)
-  const router=useRouter()
+  const [disabled, setDisabled] = React.useState<boolean>(false);
+  const [showMdp, setShowMdp] = React.useState<{
+    oldMdp: boolean;
+    newMdp: boolean;
+    confirm: boolean;
+  }>({ oldMdp: false, newMdp: false, confirm: false });
+  const router = useRouter();
 
   const route = useRouter();
 
@@ -91,9 +102,9 @@ function MenuBar({setReload}:any) {
         Cookies.remove("user");
         route.push("/");
         break;
-        case "Importer un fichier excel":
-          setOpenModalUpload(true);
-          break;
+      case "Importer un fichier excel":
+        setOpenModalUpload(true);
+        break;
       default:
         break;
     }
@@ -118,7 +129,7 @@ function MenuBar({setReload}:any) {
       values.newPassword &&
       values.confirmPassword === values.newPassword
     ) {
-      setDisabled(true)
+      setDisabled(true);
 
       const token = Cookies.get("auth-token");
 
@@ -137,7 +148,7 @@ function MenuBar({setReload}:any) {
       })
         .then((res) => res.json())
         .then((res) => {
-          setDisabled(false)
+          setDisabled(false);
           if (res.jwt) {
             setShowError("SUCCESS");
           } else {
@@ -148,16 +159,19 @@ function MenuBar({setReload}:any) {
     }
   }, [values.confirmPassword, values.newPassword, values.currentPassword]);
 
-  const handleChangeOnglet=React.useCallback((page:string)=>{
-    router.push(page)
-  },[router])
+  const handleChangeOnglet = React.useCallback(
+    (page: string) => {
+      router.push(page);
+    },
+    [router]
+  );
 
   return (
     <AppBar sx={{ backgroundColor: "#384959" }} position="static">
       <Container maxWidth="xl">
         <CustomModal open={openModal} setOpen={setOpenModal}>
           <Typography
-            sx={{ mb: "30px",color:'#000' }}
+            sx={{ mb: "30px", color: "#000" }}
             id="modal-modal-title"
             variant="h6"
             component="h2"
@@ -175,43 +189,87 @@ function MenuBar({setReload}:any) {
           ) : (
             <></>
           )}
-          <TextField
-            value={values.currentPassword}
-            name="currentPassword"
-            sx={{ width: "90%", m: "20px 0px" }}
-            id="filled-basic"
-            label="Mot de passe actuel"
-            variant="standard"
-            onChange={handleChange}
-          />
-          <TextField
-            value={values.newPassword}
-            name="newPassword"
-            sx={{ width: "90%", mb: "20px" }}
-            id="filled-basic"
-            label="Nouveau mot de passe"
-            variant="standard"
-            onChange={handleChange}
-          />
-          <TextField
-            value={values.confirmPassword}
-            name="confirmPassword"
-            sx={{ width: "90%", mb: "40px" }}
-            id="filled-basic"
-            label="Confirmer mot de passe"
-            variant="standard"
-            onChange={handleChange}
-          />
+          <Box sx={{ width: "90%", m: "20px 0px", position: "relative" }}>
+            <TextField
+              value={values.currentPassword}
+              name="currentPassword"
+              id="filled-basic"
+              label="Mot de passe actuel"
+              variant="standard"
+              onChange={handleChange}
+              type={showMdp.oldMdp ? "text" : "password"}
+              sx={{width:'100%'}}
+            />
+            <Button
+              sx={{ position: "absolute", right: "0px", top: "7px" }}
+              onClick={() =>
+                setShowMdp((prev) => ({ ...prev, oldMdp: !prev.oldMdp }))
+              }
+            >
+              {showMdp.oldMdp ? <VisibilityOff /> : <Visibility />}
+            </Button>
+          </Box>
+          <Box sx={{ width: "90%", mb: "20px", position: "relative" }}>
+            <TextField
+              value={values.newPassword}
+              name="newPassword"
+              id="filled-basic"
+              label="Nouveau mot de passe"
+              variant="standard"
+              onChange={handleChange}
+              type={showMdp.newMdp ? "text" : "password"}
+              sx={{width:'100%'}}
+            />
+            <Button
+              sx={{ position: "absolute", right: "0px", top: "7px" }}
+              onClick={() =>
+                setShowMdp((prev) => ({ ...prev, newMdp: !prev.newMdp }))
+              }
+            >
+              {showMdp.newMdp ? <VisibilityOff /> : <Visibility />}
+            </Button>
+          </Box>
+          <Box sx={{ width: "90%", mb: "40px", position: "relative" }}>
+            <TextField
+              value={values.confirmPassword}
+              name="confirmPassword"
+              id="filled-basic"
+              label="Confirmer mot de passe"
+              variant="standard"
+              onChange={handleChange}
+              type={showMdp.confirm ? "text" : "password"}
+              sx={{width:'100%'}}
+            />
+            <Button
+              sx={{ position: "absolute", right: "0px", top: "7px" }}
+              onClick={() =>
+                setShowMdp((prev) => ({ ...prev, confirm: !prev.confirm }))
+              }
+            >
+              {showMdp.confirm ? <VisibilityOff /> : <Visibility />}
+            </Button>
+          </Box>
+
           <Button
             startIcon={<Check />}
             variant="contained"
             onClick={handleValidate}
-            disabled={disabled || !values.confirmPassword || !values.currentPassword || !values.newPassword}
+            disabled={
+              disabled ||
+              !values.confirmPassword ||
+              !values.currentPassword ||
+              !values.newPassword
+            }
           >
             Modifier
           </Button>
         </CustomModal>
-        <CustomModal upload setReload={setReload} open={openModalUpload} setOpen={setOpenModalUpload}>
+        <CustomModal
+          upload
+          setReload={setReload}
+          open={openModalUpload}
+          setOpen={setOpenModalUpload}
+        >
           <ExcelFileUploader />
         </CustomModal>
         <Toolbar disableGutters>
@@ -259,7 +317,7 @@ function MenuBar({setReload}:any) {
               sx={{ display: { xs: "block", md: "none" } }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={()=>handleChangeOnglet(page)}>
+                <MenuItem key={page} onClick={() => handleChangeOnglet(page)}>
                   <Typography sx={{ textAlign: "center" }}>{page}</Typography>
                 </MenuItem>
               ))}
@@ -285,7 +343,7 @@ function MenuBar({setReload}:any) {
             {pages.map((page) => (
               <Button
                 key={page}
-                onClick={()=>handleChangeOnglet(page)}
+                onClick={() => handleChangeOnglet(page)}
                 sx={{ my: 2, color: "white", display: "block" }}
               >
                 {page}
