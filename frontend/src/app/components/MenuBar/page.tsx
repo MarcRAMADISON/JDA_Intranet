@@ -14,7 +14,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import Image from "next/image";
 import CustomModal from "../Modal/page";
-import { Alert, TextField, useScrollTrigger } from "@mui/material";
+import { Alert, TextField } from "@mui/material";
 import {
   Check,
   MenuOpen,
