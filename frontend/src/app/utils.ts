@@ -58,7 +58,7 @@ export const handleExport = (data: any) => {
   XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
   // Écriture du fichier
-  XLSX.writeFile(workbook, "output.xlsx");
+  XLSX.writeFile(workbook, "base_de_donnee.xlsx");
 };
 
 export const importExcel = () => {
