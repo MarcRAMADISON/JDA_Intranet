@@ -13,6 +13,7 @@ const ExcelFileUploader = () => {
     doublon: 0,
   });
   const [disabled,setDisabled]=useState<boolean>(false)
+  const [done,setDone]=useState<boolean>(false)
 
   // Fonction pour gérer l'importation du fichier
   const handleFileUpload = (event: any) => {
@@ -34,7 +35,7 @@ const ExcelFileUploader = () => {
 
         // Convertir la feuille en JSON
         const jsonData: any = XLSX.utils.sheet_to_json(sheet);
-        setData(jsonData); // Stocker les données dans l'état
+        setData(jsonData);
       };
 
       reader.readAsBinaryString(file);
@@ -93,11 +94,19 @@ const ExcelFileUploader = () => {
           .then((res) => {
             if (res.type === "ALREADY_EXISTS") {
               setCount((prev) => {
+                if(prev.doublon + 1 + prev.fiche === data.length){
+                  setDone(true)
+                }
                 return{ ...prev, doublon: prev.doublon + 1 }
               });
+
+              
               
             } else {
               setCount((prev) => {
+                if(prev.doublon + prev.fiche + 1 === data.length){
+                  setDone(true)
+                }
                 return { ...prev, fiche: prev.fiche + 1 }
               });
             }
@@ -107,6 +116,8 @@ const ExcelFileUploader = () => {
 
     }
   };
+
+  console.log('done',done)
 
   return (
     <Box
@@ -128,6 +139,7 @@ const ExcelFileUploader = () => {
           </Button>
           <Typography variant='body2' color='text.secondary'>{count.fiche} fiches enregistrées</Typography>
           <Typography variant='body2' color='text.secondary'>{count.doublon} doublons détéctés</Typography>
+          {done && <Typography variant='body2' color='primary'>Importation terminée</Typography>}
         </>
       )}
     </Box>
