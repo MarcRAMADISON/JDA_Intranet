@@ -19,6 +19,7 @@ import { getData, getUsers, handleExport, sortData } from "../utils";
 import { Delete, Download, Edit, Search as SearchIcon, Share } from "@mui/icons-material";
 import Cookies from "js-cookie";
 import CustomModal from "../components/Modal/page";
+import Loader from "../components/loader/page";
 
 interface filterObject {
   statut: string;
@@ -65,8 +66,10 @@ function Fiches() {
     delete: false,
     change: false,
   });
+  const [showLoading,setShowLoading]=useState<boolean>(true)
 
   useEffect(() => {
+    setShowLoading(true)
     getData({search:search, filters:filters, start: 20 * (currentPage - 1), limit: 20 })
       .then((res) => res.json())
       .then((res) => {
@@ -76,6 +79,7 @@ function Fiches() {
           total: res?.meta?.pagination?.total || 0,
         }));
         setRows(sortData(data));
+        setShowLoading(false)
       });
 
     const user = Cookies.get("user");
@@ -101,6 +105,8 @@ function Fiches() {
     (event: any) => {
       event.preventDefault();
 
+      setShowLoading(true)
+
       setSearch('')
       setCurrentPage(1)
       setFilters((prev) => ({
@@ -118,6 +124,7 @@ function Fiches() {
               total: res?.meta?.pagination?.total || 0,
             }));
             setRows(sortData(data));
+            setShowLoading(false)
           });
       } else {
         getData({
@@ -131,6 +138,7 @@ function Fiches() {
               total: res?.meta?.pagination?.total || 0,
             }));
             setRows(sortData(data));
+            setShowLoading(false)
           });
       }
     },
@@ -140,6 +148,8 @@ function Fiches() {
   const handleChangePagination = useCallback(
     (event: any, page: number) => {
       event.preventDefault();
+      setShowLoading(true)
+
       getData({ search, filters, start: 20 * (page - 1), limit: 20 })
         .then((res) => res.json())
         .then((res) => {
@@ -150,6 +160,7 @@ function Fiches() {
           }));
           setRows(sortData(data));
           setCurrentPage(page);
+          setShowLoading(false)
         });
     },
     [filters,search]
@@ -273,6 +284,7 @@ function Fiches() {
   );
 
   const handleSearch=useCallback(()=>{
+    setShowLoading(true)
 
     if(search){
       getData({ search,start: 0, limit: 20 })
@@ -286,6 +298,8 @@ function Fiches() {
         setFilters(defaultFilter);
         setCurrentPage(1)
         setRows(sortData(data));
+        setShowLoading(false)
+
       });
     }else{
       getData({filters:filters, start: 20 * (currentPage - 1), limit: 20 })
@@ -298,6 +312,8 @@ function Fiches() {
         }));
         setRows(sortData(data));
         setCurrentPage(1)
+        setShowLoading(false)
+
       });
     }
     
@@ -539,6 +555,7 @@ function Fiches() {
             Aucune fiche n&apos;a encore été créée pour le moment.
           </Typography>}
       </Box>
+      {showLoading ? <Loader/> : <></>}
     </Box>
   );
 }

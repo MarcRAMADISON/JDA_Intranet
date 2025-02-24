@@ -15,6 +15,7 @@ import { useCallback, useEffect, useState } from "react";
 import { getAnnualStat, getUsers, statuts } from "../../utils";
 import { Search } from "@mui/icons-material";
 import Cookies from "js-cookie";
+import Loader from "../loader/page";
 
 interface monthlyDataObject {
   label: string;
@@ -34,6 +35,7 @@ function IndividualStatistiques() {
   const [userList, setUserList] =
     useState<{ id: number; username: string }[]>();
   const [selectedUser, setSelectedUser] = useState<{ id: number }>({ id: 0 });
+  const [loading,setLoading]=useState<boolean>(true)
 
   useEffect(()=>{
     getUsers()
@@ -58,6 +60,8 @@ function IndividualStatistiques() {
   },[])
 
   useEffect(() => {
+
+    setLoading(true)
 
     if(selectedUser.id){
 
@@ -87,6 +91,8 @@ function IndividualStatistiques() {
             statut: res?.global?.statuts,
             totalFicheAnnuel: res?.global?.totalAnnuel,
           });
+
+          setLoading(false)
         }
       });
 
@@ -98,6 +104,8 @@ function IndividualStatistiques() {
 
 
   const handleSearch = useCallback(() => {
+
+    setLoading(true)
     setDetailStatut([]);
     setAnnuelData({ data: [], statut: [], totalFicheAnnuel: 0 });
 
@@ -125,6 +133,8 @@ function IndividualStatistiques() {
           totalFicheAnnuel: res?.global?.totalAnnuel,
         });
       }
+      setLoading(false)
+
     });
   },[search, selectedUser.id]);
 
@@ -278,6 +288,7 @@ function IndividualStatistiques() {
             <></>
           )}
         </Box></> : <Typography variant='body1' color='text.secondary'>L&apos;utilisateur n&apos;a pas encore créée de fiche pour le moment</Typography>}
+        {loading ? <Loader/> : <></>}
       </Box>
     </Box>
   );

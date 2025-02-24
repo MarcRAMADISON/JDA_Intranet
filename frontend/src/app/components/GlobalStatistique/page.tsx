@@ -5,6 +5,7 @@ import CustomChart from "../CustomChart/page";
 import { useEffect, useState } from "react";
 import { getAnnualStat, statuts } from "../../utils";
 import { Search } from "@mui/icons-material";
+import Loader from "../loader/page";
 
 interface monthlyDataObject {
   label: string;
@@ -21,8 +22,11 @@ function GlobalStatistiques() {
   const [annuelData, setAnnuelData] = useState<annuelDataObject | undefined>();
   const [detailStatut, setDetailStatut] = useState<any>();
   const [search, setSearch] = useState<number>(new Date().getFullYear());
+  const [loading,setLoading]=useState<boolean>(true)
+
 
   useEffect(() => {
+    setLoading(true)
     setDetailStatut([]);
     setAnnuelData({ data: [], statut: [], totalFicheAnnuel: 0 });
     getAnnualStat({ year: new Date().getFullYear() }).then((res) => {
@@ -48,11 +52,13 @@ function GlobalStatistiques() {
           statut: res?.global?.statuts,
           totalFicheAnnuel: res?.global?.totalAnnuel,
         });
+        setLoading(false)
       }
     });
   }, []);
 
   const handleSearch = () => {
+    setLoading(true)
     setDetailStatut([]);
     setAnnuelData({ data: [], statut: [], totalFicheAnnuel: 0 });
 
@@ -79,6 +85,7 @@ function GlobalStatistiques() {
           statut: res?.global?.statuts,
           totalFicheAnnuel: res?.global?.totalAnnuel,
         });
+        setLoading(false)
       }
     });
   };
@@ -222,6 +229,7 @@ function GlobalStatistiques() {
             Votre équipe n&apos;a pas encore créée de fiche pour le moment
           </Typography>
         )}
+        {loading ? <Loader/> : <></>}
       </Box>
     </Box>
   );
