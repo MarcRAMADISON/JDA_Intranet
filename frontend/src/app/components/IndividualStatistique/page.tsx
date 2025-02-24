@@ -92,8 +92,8 @@ function IndividualStatistiques() {
             totalFicheAnnuel: res?.global?.totalAnnuel,
           });
 
-          setLoading(false)
         }
+        setLoading(false)
       });
 
     }
