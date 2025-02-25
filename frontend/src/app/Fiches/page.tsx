@@ -405,14 +405,14 @@ function Fiches() {
           <Button variant="contained" onClick={handleOpenModal}>
             Nouvelle fiche
           </Button>
-          <Button
+          {userType === "ADMIN" && <Button
             startIcon={<Download />}
             size="small"
             onClick={handleExportAction}
             variant="contained"
           >
             Exporter
-          </Button>
+          </Button>}
           <Box sx={{display:'flex',height:"60px",width:"100%"}}>
             <TextField id="outlined-basic" label="Téléphone / établissement / localisation" variant="outlined" value={search} onChange={(e)=>setSearch(e.target.value)} />
             <Button sx={{height:"60px"}} variant='text' onClick={handleSearch}>
