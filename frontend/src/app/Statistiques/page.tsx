@@ -58,7 +58,7 @@ export default function Statistiques() {
   return (
     <Box>
       <MenuBar />
-      <Box sx={{ width: "90%", mt: "50px", placeSelf: "center" }}>
+      <Box sx={{ width: "90%", mt: "50px", placeSelf: "center",ml:"4vw" }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs
             value={value}

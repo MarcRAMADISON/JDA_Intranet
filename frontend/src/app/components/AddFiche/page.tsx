@@ -362,6 +362,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
               <MenuItem value="Ne plus appeler">Ne plus appeler</MenuItem>
               <MenuItem value="Hors cible">Hors cible</MenuItem>
               <MenuItem value="Faux numéro">Faux numéro</MenuItem>
+              <MenuItem value="A signer">A signer</MenuItem>
               <MenuItem value="Vente OK">Vente OK</MenuItem>
             </Select>
           ) : (

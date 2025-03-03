@@ -318,9 +318,7 @@ export const getAnnualStat = ({
             }
          })
 
-         const dataStatut= type === 'ADMIN' ? statuts : statutsAgent
-
-          const statutData = dataStatut.map((statut) => {
+          const statutData = statuts.map((statut) => {
             return {
               statut,
               nbFiche: (filtredMonthlyData || []).filter((d: any) => {
@@ -363,5 +361,6 @@ export const getAnnualStat = ({
           },
         };
       }
+
     });
 };

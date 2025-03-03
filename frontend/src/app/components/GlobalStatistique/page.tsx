@@ -30,6 +30,7 @@ function GlobalStatistiques() {
     setDetailStatut([]);
     setAnnuelData({ data: [], statut: [], totalFicheAnnuel: 0 });
     getAnnualStat({ year: new Date().getFullYear() }).then((res) => {
+      
       if (res) {
         const data: monthlyDataObject[] = res.global.monthData.map((month) => ({
           label: month.label,
@@ -40,22 +41,27 @@ function GlobalStatistiques() {
           const data = res.global.monthData.map((month) => ({
             label: month.label,
             nbFiche: month.statuts.find((statut) => statut.statut === s)
-              ?.nbFiche,
+              ?.nbFiche || 0,
           }));
+
 
           return { statut: s, data };
         });
         setDetailStatut(detailData);
+
 
         setAnnuelData({
           data: data,
           statut: res?.global?.statuts,
           totalFicheAnnuel: res?.global?.totalAnnuel,
         });
-        setLoading(false)
       }
-    });
+      setLoading(false)
+
+    }).catch(()=>setLoading(false));
+
   }, []);
+
 
   const handleSearch = () => {
     setLoading(true)
@@ -85,10 +91,12 @@ function GlobalStatistiques() {
           statut: res?.global?.statuts,
           totalFicheAnnuel: res?.global?.totalAnnuel,
         });
-        setLoading(false)
       }
+      setLoading(false)
+
     });
   };
+
 
   return (
     <Box>

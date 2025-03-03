@@ -93,7 +93,6 @@ function IndividualStatistiques() {
             return { statut: s, data };
           });
 
-          console.log('statuts',statuts,)
 
           setDetailStatut(detailData? detailData : []);
   
