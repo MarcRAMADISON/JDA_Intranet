@@ -1,4 +1,4 @@
-  "use client";
+"use client";
 
 import {
   Alert,
@@ -17,7 +17,7 @@ import Cookies from "js-cookie";
 import { Check } from "@mui/icons-material";
 
 interface ficheFormType {
-  id?:number;
+  id?: number;
   responsable: string;
   localisation: string;
   secteurActivite: string;
@@ -30,7 +30,7 @@ interface ficheFormType {
   reseauxSociaux: string;
   nbFollowers: string;
   siteWeb: string;
-  siren:number;
+  siren: number;
 }
 
 const defaultValues = {
@@ -46,7 +46,7 @@ const defaultValues = {
   reseauxSociaux: "",
   nbFollowers: "",
   siteWeb: "",
-  siren:0
+  siren: 0,
 };
 
 /*interface AddFicheProps {
@@ -56,36 +56,37 @@ const defaultValues = {
   setOpenModal: (value: boolean) => void;
 }*/
 
-function AddFiche({
-  setReload,
-  openModal,
-  setOpenModal,
-  row,
-}: any
-) {
+function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
   const [values, setValues] = useState<ficheFormType>(defaultValues);
   const [showMessage, setShowMessage] = useState<
     "HIDE" | "ERROR" | "SUCCESS" | "ALREADY_EXISTS"
   >("HIDE");
+  const [userType, setUserType] = useState<"ADMIN" | "AGENT">("AGENT");
 
   useEffect(() => {
+    const user = Cookies.get("user");
+
+    if (JSON.parse(user || "")?.type === "ADMIN") {
+      setUserType("ADMIN");
+    }
+
     if (row) {
       setValues({
-        responsable: row?.responsable || '',
-        localisation: row?.localisation || '',
-        secteurActivite: row?.secteurActivite || '',
-        etablissement: row?.etablissement || '',
-        email: row?.email || '',
-        ligneDirecte: row?.ligneDirecte || '',
-        statut: row?.statut || '',
-        telephoneStandard: row?.telephoneStandard || '',
+        responsable: row?.responsable || "",
+        localisation: row?.localisation || "",
+        secteurActivite: row?.secteurActivite || "",
+        etablissement: row?.etablissement || "",
+        email: row?.email || "",
+        ligneDirecte: row?.ligneDirecte || "",
+        statut: row?.statut || "",
+        telephoneStandard: row?.telephoneStandard || "",
         nbEtoile: row?.nbEtoile || 0,
-        reseauxSociaux: row?.reseauxSociaux || '',
+        reseauxSociaux: row?.reseauxSociaux || "",
         nbFollowers: row?.nbFollowers || "0",
-        siteWeb: row?.siteWeb || '',
-        siren: row?.siren || 0
+        siteWeb: row?.siteWeb || "",
+        siren: row?.siren || 0,
       });
-      setShowMessage("HIDE")
+      setShowMessage("HIDE");
     }
   }, [row, setValues]);
 
@@ -107,6 +108,10 @@ function AddFiche({
       const token = Cookies.get("auth-token");
       const user = Cookies.get("user");
       const idUser = JSON.parse(user || "").id;
+
+      if (JSON.parse(user || "")?.type === "ADMIN") {
+        setUserType("ADMIN");
+      }
 
       if (row) {
         fetch(`${process.env.NEXT_PUBLIC_URL}/api/fiches/${row.id}`, {
@@ -130,8 +135,8 @@ function AddFiche({
               reseauxSociaux: values.reseauxSociaux,
               nbFollowers: values.nbFollowers,
               siteWeb: values.siteWeb,
-              siren: values.statut === 'Vente OK' ? values.siren : 0,
-              venduePar: values.statut === 'Vente OK' ? idUser : null,
+              siren: values.statut === "Vente OK" ? values.siren : 0,
+              venduePar: values.statut === "Vente OK" ? idUser : null,
             },
           }),
         })
@@ -140,7 +145,7 @@ function AddFiche({
             if (res.data) {
               setValues(defaultValues);
               setShowMessage("SUCCESS");
-              setReload((prev:any) => !prev);
+              setReload((prev: any) => !prev);
               setOpenModal(false);
             } else {
               setShowMessage("ERROR");
@@ -159,7 +164,7 @@ function AddFiche({
         },
         body: JSON.stringify({
           user: idUser,
-          venduePar: values.statut === 'Vente OK' ? idUser : null,
+          venduePar: values.statut === "Vente OK" ? idUser : null,
           ...values,
         }),
       })
@@ -172,17 +177,17 @@ function AddFiche({
           } else {
             setShowMessage("SUCCESS");
             setValues(defaultValues);
-            setReload((prev:any) => !prev);
+            setReload((prev: any) => !prev);
           }
         });
     }
   };
 
-  const validateEmail=useCallback((email:string)=>{
-    const pattern=/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const validateEmail = useCallback((email: string) => {
+    const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    return pattern.test(email)
-  },[])
+    return pattern.test(email);
+  }, []);
 
   return (
     <CustomModal
@@ -297,7 +302,9 @@ function AddFiche({
           label="Adresse e-mail"
           variant="standard"
           onChange={handleChange}
-          color={values.email && !validateEmail(values.email)? "error" : undefined}
+          color={
+            values.email && !validateEmail(values.email) ? "error" : undefined
+          }
         />
         <TextField
           value={values.reseauxSociaux}
@@ -338,36 +345,52 @@ function AddFiche({
         />
         <FormControl fullWidth>
           <InputLabel id="demo-simple-select-label">Statut *</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={values.statut}
-            name="statut"
-            label="Type d'établissement"
-            onChange={handleChange}
-            sx={{ width: "90%", mb: "10px" }}
-          >
-            <MenuItem value="Nouveau">Nouveau</MenuItem>
-            <MenuItem value="Injoignable">Injoignable</MenuItem>
-            <MenuItem value="Ne répond pas">Ne répond pas</MenuItem>
-            <MenuItem value="A rappeler">A rappeler</MenuItem>
-            <MenuItem value="Ne plus appeler">Ne plus appeler</MenuItem>
-            <MenuItem value="Hors cible">Hors cible</MenuItem>
-            <MenuItem value="Faux numéro">Faux numéro</MenuItem>
-            <MenuItem value="Vente OK">Vente OK</MenuItem>={" "}
-          </Select>
+          {userType === "ADMIN" ? (
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={values.statut}
+              name="statut"
+              label="Type d'établissement"
+              onChange={handleChange}
+              sx={{ width: "90%", mb: "10px" }}
+            >
+              <MenuItem value="Nouveau">Nouveau</MenuItem>
+              <MenuItem value="Injoignable">Injoignable</MenuItem>
+              <MenuItem value="Ne répond pas">Ne répond pas</MenuItem>
+              <MenuItem value="A rappeler">A rappeler</MenuItem>
+              <MenuItem value="Ne plus appeler">Ne plus appeler</MenuItem>
+              <MenuItem value="Hors cible">Hors cible</MenuItem>
+              <MenuItem value="Faux numéro">Faux numéro</MenuItem>
+              <MenuItem value="Vente OK">Vente OK</MenuItem>
+            </Select>
+          ) : (
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={values.statut}
+              name="statut"
+              label="Type d'établissement"
+              onChange={handleChange}
+              sx={{ width: "90%", mb: "10px" }}
+            >
+              <MenuItem value="A rappeler">A rappeler</MenuItem>
+              <MenuItem value="A signer">A signer</MenuItem>
+            </Select>
+          )}
         </FormControl>
-        { values.statut === 'Vente OK' && <TextField
-          value={values.siren}
-          name="siren"
-          sx={{ width: "90%", mb: "10px" }}
-          id="filled-basic"
-          label="Siren"
-          variant="standard"
-          onChange={handleChange}
-        />}
+        {values.statut === "Vente OK" && (
+          <TextField
+            value={values.siren}
+            name="siren"
+            sx={{ width: "90%", mb: "10px" }}
+            id="filled-basic"
+            label="Siren"
+            variant="standard"
+            onChange={handleChange}
+          />
+        )}
       </Box>
-      
 
       <Button
         sx={{ mt: "30px" }}

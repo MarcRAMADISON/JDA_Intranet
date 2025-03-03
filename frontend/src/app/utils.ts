@@ -86,13 +86,14 @@ export const sortData = (data: any) => {
   const priorites = [
     "Nouveau",
     "A rappeler",
+    "A signer",
     "Injoignable",
     "Ne répond pas",
     "Hors cible",
     "Ne plus appeler",
     "Faux numéro",
     "Vente OK",
-  ]; // Ordre de priorité pour les villes
+  ]; 
   const tableauTrie = data.sort((a: any, b: any) => {
     const indexA = priorites.indexOf(a?.statut);
     const indexB = priorites.indexOf(b?.statut);
@@ -265,8 +266,14 @@ export const statuts = [
   "Ne plus appeler",
   "Hors cible",
   "Faux numéro",
+  "A signer",
   "Vente OK",
 ];
+
+export const statutsAgent= [
+  "A rappeler",
+  "A signer"
+]
 
 export const getAnnualStat = ({
   year,
@@ -311,7 +318,9 @@ export const getAnnualStat = ({
             }
          })
 
-          const statutData = statuts.map((statut) => {
+         const dataStatut= type === 'ADMIN' ? statuts : statutsAgent
+
+          const statutData = dataStatut.map((statut) => {
             return {
               statut,
               nbFiche: (filtredMonthlyData || []).filter((d: any) => {

@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import CustomChart from "../CustomChart/page";
 import { useCallback, useEffect, useState } from "react";
-import { getAnnualStat, getUsers, statuts } from "../../utils";
+import { getAnnualStat, getUsers, statuts, statutsAgent } from "../../utils";
 import { Search } from "@mui/icons-material";
 import Cookies from "js-cookie";
 import Loader from "../loader/page";
@@ -35,7 +35,8 @@ function IndividualStatistiques() {
   const [userList, setUserList] =
     useState<{ id: number; username: string }[]>();
   const [selectedUser, setSelectedUser] = useState<{ id: number }>({ id: 0 });
-  const [loading,setLoading]=useState<boolean>(true)
+  const [loading,setLoading]=useState<boolean>(true);
+  const [currentStatut,setCurrentStatut]=useState<string[]>([])
 
   useEffect(()=>{
     getUsers()
@@ -57,6 +58,7 @@ function IndividualStatistiques() {
       
       
     });
+
   },[])
 
   useEffect(() => {
@@ -68,14 +70,20 @@ function IndividualStatistiques() {
       getAnnualStat({ year: new Date().getFullYear(), idUser:selectedUser.id, type:'INDIVIDUAL' }).then((res) => {
         if (res) {
 
-          
+          const user = Cookies.get("user");
+          const dataUser = user && JSON.parse(user);
+      
+          const filtredStatuts = dataUser?.type === "ADMIN" ? statuts : statutsAgent;
+      
+          setCurrentStatut(filtredStatuts);
 
+          
           const data: monthlyDataObject[] = res.global.monthData.map((month) => ({
             label: month.label,
             nbFiche: month.nbFiche,
           }));
   
-          const detailData = statuts.map((s) => {
+          const detailData = filtredStatuts.map((s) => {
             const data = res.global.monthData.map((month) => ({
               label: month.label,
               nbFiche: month.statuts.find((statut) => statut.statut === s)
@@ -84,7 +92,10 @@ function IndividualStatistiques() {
   
             return { statut: s, data };
           });
-          setDetailStatut(detailData);
+
+          console.log('statuts',statuts,)
+
+          setDetailStatut(detailData? detailData : []);
   
           setAnnuelData({
             data: data,
@@ -110,13 +121,13 @@ function IndividualStatistiques() {
     setAnnuelData({ data: [], statut: [], totalFicheAnnuel: 0 });
 
     getAnnualStat({ year: search, idUser: selectedUser.id, type: 'INDIVIDUAL' }).then((res) => {
-      if (res) {
+      if (res && currentStatut.length) {
         const data: monthlyDataObject[] = res.global.monthData.map((month) => ({
           label: month.label,
           nbFiche: month.nbFiche,
         }));
 
-        const detailData = statuts.map((s) => {
+        const detailData = currentStatut.map((s) => {
           const data = res.global.monthData.map((month) => ({
             label: month.label,
             nbFiche: month.statuts.find((statut) => statut.statut === s)
@@ -136,7 +147,7 @@ function IndividualStatistiques() {
       setLoading(false)
 
     });
-  },[search, selectedUser.id]);
+  },[currentStatut, search, selectedUser.id]);
 
   return (
     <Box>
@@ -263,7 +274,7 @@ function IndividualStatistiques() {
           }}
         >
           {detailStatut?.length ? (
-            statuts.map((statut) => {
+            currentStatut.map((statut) => {
               return (
                 <Box
                   sx={{ display: "flex", flexDirection: "column" }}
