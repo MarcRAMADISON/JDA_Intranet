@@ -187,8 +187,8 @@ export default function CustomTable({
         setReload={setReload}
         row={currentRow}
       />
-      <TableContainer component={Paper}>
-        <Table>
+      <TableContainer component={Paper} sx={{overflowX:"visible"}}>
+        <Table >
           <TableHead>
             <TableRow style={{ backgroundColor: "#1976d2" }}>
               <TableCell onClick={() => {}}>
@@ -397,7 +397,6 @@ export default function CustomTable({
                   : { backgroundColor: "#1976d2", color: "#fff" };
 
               const user = Cookies.get("user");
-              const type = JSON.parse(user || "").type;
 
               return (
                 <TableRow
@@ -614,7 +613,7 @@ export default function CustomTable({
                         <Share />
                       </Button>
                     )}
-                    {type === "ADMIN" && (
+                     
                       <Button
                         size="small"
                         variant="outlined"
@@ -624,7 +623,7 @@ export default function CustomTable({
                       >
                         <Delete />
                       </Button>
-                    )}
+                    
                   </TableCell>
                 </TableRow>
               );

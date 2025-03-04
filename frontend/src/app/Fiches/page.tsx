@@ -564,7 +564,7 @@ function Fiches() {
             >
               Modifier statut
             </Button>
-            {userType === "ADMIN" && (
+            
               <Button
                 startIcon={<Delete />}
                 size="small"
@@ -577,7 +577,7 @@ function Fiches() {
               >
                 Supprimer
               </Button>
-            )}
+            
             <Typography variant="body2" color="text.secondary">
               {selectedRows.length} fiches sélectionnées
             </Typography>
