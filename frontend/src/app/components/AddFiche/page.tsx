@@ -15,6 +15,15 @@ import CustomModal from "../Modal/page";
 import { useCallback, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { Check } from "@mui/icons-material";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { Dayjs } from "dayjs";
+import dayjs from 'dayjs';
+
+import 'dayjs/locale/fr'; 
+
 
 interface ficheFormType {
   id?: number;
@@ -31,6 +40,7 @@ interface ficheFormType {
   nbFollowers: string;
   siteWeb: string;
   siren: number;
+  comment:string;
 }
 
 const defaultValues = {
@@ -47,6 +57,7 @@ const defaultValues = {
   nbFollowers: "",
   siteWeb: "",
   siren: 0,
+  comment:""
 };
 
 /*interface AddFicheProps {
@@ -62,6 +73,8 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
     "HIDE" | "ERROR" | "SUCCESS" | "ALREADY_EXISTS"
   >("HIDE");
   const [userType, setUserType] = useState<"ADMIN" | "AGENT">("AGENT");
+  const [date, setDate] = useState<Dayjs | null>(null);
+
 
   useEffect(() => {
     const user = Cookies.get("user");
@@ -71,6 +84,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
     }
 
     if (row) {
+
       setValues({
         responsable: row?.responsable || "",
         localisation: row?.localisation || "",
@@ -85,10 +99,23 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
         nbFollowers: row?.nbFollowers || "0",
         siteWeb: row?.siteWeb || "",
         siren: row?.siren || 0,
+        comment: row?.comment || '',
       });
+
+      console.log('row',row?.dateHeureRappel,dayjs(row?.dateHeureRappel,'DD/MM/YYYY hh:mm'))
+
+      dayjs.extend(customParseFormat);
+
+      setDate(dayjs(row?.dateHeureRappel || '','DD/MM/YYYY HH:mm'))
+
       setShowMessage("HIDE");
     }
+
+    dayjs.locale('fr');
+
   }, [row, setValues]);
+
+  console.log('date',date)
 
   const handleChange = useCallback((event: any) => {
     setValues((prev) => ({
@@ -137,6 +164,8 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
               siteWeb: values.siteWeb,
               siren: values.statut === "Vente OK" ? values.siren : 0,
               venduePar: values.statut === "Vente OK" ? idUser : null,
+              comment:values.comment,
+              dateHeureRappel: date? date.format('DD/MM/YYYY HH:mm') : ''
             },
           }),
         })
@@ -165,6 +194,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
         body: JSON.stringify({
           user: idUser,
           venduePar: values.statut === "Vente OK" ? idUser : null,
+          dateHeureRappel: date? date.format('DD/MM/YYYY HH:mm') : '',
           ...values,
         }),
       })
@@ -188,6 +218,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
 
     return pattern.test(email);
   }, []);
+
 
   return (
     <CustomModal
@@ -391,6 +422,24 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
             onChange={handleChange}
           />
         )}
+        {values.statut === "A rappeler" && (
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="fr">
+            <DateTimePicker
+              label="Date et Heure de rappel"
+              value={date}
+              onChange={(newValue) => setDate(newValue)}
+            />
+          </LocalizationProvider>
+        )}
+         <TextField
+          id="outlined-multiline-static"
+          label="Commentaire"
+          name='comment'
+          multiline
+          rows={4}
+          value={values.comment}
+          onChange={handleChange}
+        />
       </Box>
 
       <Button

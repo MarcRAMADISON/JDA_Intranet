@@ -68,6 +68,12 @@
     },
     "nbFollowers": {
       "type": "string"
+    },
+    "comment": {
+      "type": "text"
+    },
+    "dateHeureRappel": {
+      "type": "string"
     }
   }
 }

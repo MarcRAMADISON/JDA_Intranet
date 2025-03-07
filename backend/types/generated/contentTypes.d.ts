@@ -452,6 +452,7 @@ export interface ApiFicheFiche extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
+    comment: Attribute.Text;
     createdAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
       'api::fiche.fiche',
@@ -459,6 +460,7 @@ export interface ApiFicheFiche extends Schema.CollectionType {
       'admin::user'
     > &
       Attribute.Private;
+    dateHeureRappel: Attribute.String;
     email: Attribute.String;
     etablissement: Attribute.String;
     ligneDirecte: Attribute.String;

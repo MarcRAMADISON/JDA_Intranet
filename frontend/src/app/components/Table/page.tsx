@@ -242,6 +242,16 @@ export default function CustomTable({
                   minWidth: "150px",
                 }}
               >
+                Date et heure de rappel
+              </TableCell>
+              <TableCell
+                style={{
+                  fontSize: "0.9rem",
+                  color: "#fff",
+                  fontWeight: "bold",
+                  minWidth: "150px",
+                }}
+              >
                 Créé par
               </TableCell>
               <TableCell
@@ -458,6 +468,14 @@ export default function CustomTable({
                     }}
                   >
                     {moment(row.createdAt).format("DD/MM/YYYY")}
+                  </TableCell>
+                  <TableCell
+                    onClick={() => {
+                      setCurrentRow(row);
+                      setOpenUpdateModal(true);
+                    }}
+                  >
+                    {row.dateHeureRappel? moment(row.dateHeureRappel,'DD/MM/YYYY HH:mm').format("DD/MM/YYYY HH:mm") : ""}
                   </TableCell>
                   <TableCell
                     onClick={() => {
