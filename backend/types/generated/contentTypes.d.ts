@@ -471,7 +471,8 @@ export interface ApiFicheFiche extends Schema.CollectionType {
     reseauxSociaux: Attribute.String;
     responsable: Attribute.String;
     secteurActivite: Attribute.String;
-    siren: Attribute.BigInteger;
+    siren: Attribute.String;
+    siret: Attribute.String;
     siteWeb: Attribute.String;
     statut: Attribute.String;
     telephoneStandard: Attribute.String;

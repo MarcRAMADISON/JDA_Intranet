@@ -18,12 +18,11 @@ import { Check } from "@mui/icons-material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import customParseFormat from 'dayjs/plugin/customParseFormat';
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import { Dayjs } from "dayjs";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 
-import 'dayjs/locale/fr'; 
-
+import "dayjs/locale/fr";
 
 interface ficheFormType {
   id?: number;
@@ -39,8 +38,9 @@ interface ficheFormType {
   reseauxSociaux: string;
   nbFollowers: string;
   siteWeb: string;
-  siren: number;
-  comment:string;
+  siren: string;
+  comment: string;
+  siret:string;
 }
 
 const defaultValues = {
@@ -56,8 +56,9 @@ const defaultValues = {
   reseauxSociaux: "",
   nbFollowers: "",
   siteWeb: "",
-  siren: 0,
-  comment:""
+  siren: "",
+  comment: "",
+  siret:""
 };
 
 /*interface AddFicheProps {
@@ -75,7 +76,6 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
   const [userType, setUserType] = useState<"ADMIN" | "AGENT">("AGENT");
   const [date, setDate] = useState<Dayjs | null>(null);
 
-
   useEffect(() => {
     const user = Cookies.get("user");
 
@@ -84,7 +84,6 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
     }
 
     if (row) {
-
       setValues({
         responsable: row?.responsable || "",
         localisation: row?.localisation || "",
@@ -98,24 +97,21 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
         reseauxSociaux: row?.reseauxSociaux || "",
         nbFollowers: row?.nbFollowers || "0",
         siteWeb: row?.siteWeb || "",
-        siren: row?.siren || 0,
-        comment: row?.comment || '',
+        siren: row?.siren || "",
+        comment: row?.comment || "",
+        siret: row?.siret || '',
       });
-
-      console.log('row',row?.dateHeureRappel,dayjs(row?.dateHeureRappel,'DD/MM/YYYY hh:mm'))
 
       dayjs.extend(customParseFormat);
 
-      setDate(dayjs(row?.dateHeureRappel || '','DD/MM/YYYY HH:mm'))
+      setDate(row?.dateHeureRappel? dayjs(row?.dateHeureRappel, "DD/MM/YYYY HH:mm") : null);
 
       setShowMessage("HIDE");
     }
 
-    dayjs.locale('fr');
-
+    dayjs.locale("fr");
   }, [row, setValues]);
 
-  console.log('date',date)
 
   const handleChange = useCallback((event: any) => {
     setValues((prev) => ({
@@ -162,10 +158,11 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
               reseauxSociaux: values.reseauxSociaux,
               nbFollowers: values.nbFollowers,
               siteWeb: values.siteWeb,
-              siren: values.statut === "Vente OK" ? values.siren : 0,
+              siren: values.siren,
+              siret: values.siret,
               venduePar: values.statut === "Vente OK" ? idUser : null,
-              comment:values.comment,
-              dateHeureRappel: date? date.format('DD/MM/YYYY HH:mm') : ''
+              comment: values.comment,
+              dateHeureRappel: date && dayjs(date).isValid() ? date.format("DD/MM/YYYY HH:mm") : null,
             },
           }),
         })
@@ -194,7 +191,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
         body: JSON.stringify({
           user: idUser,
           venduePar: values.statut === "Vente OK" ? idUser : null,
-          dateHeureRappel: date? date.format('DD/MM/YYYY HH:mm') : '',
+          dateHeureRappel: date ? date.format("DD/MM/YYYY HH:mm") : "",
           ...values,
         }),
       })
@@ -218,7 +215,6 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
 
     return pattern.test(email);
   }, []);
-
 
   return (
     <CustomModal
@@ -431,10 +427,32 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
             />
           </LocalizationProvider>
         )}
-         <TextField
+        {values.statut === "A signer" && (
+          <>
+            <TextField
+              value={values.siren}
+              name="siren"
+              sx={{ width: "90%", mb: "10px" }}
+              id="filled-basic"
+              label="Siren"
+              variant="standard"
+              onChange={handleChange}
+            />
+            <TextField
+              value={values.siret}
+              name="siret"
+              sx={{ width: "90%", mb: "10px" }}
+              id="filled-basic"
+              label="Siret"
+              variant="standard"
+              onChange={handleChange}
+            />
+          </>
+        )}
+        <TextField
           id="outlined-multiline-static"
           label="Commentaire"
-          name='comment'
+          name="comment"
           multiline
           rows={4}
           value={values.comment}

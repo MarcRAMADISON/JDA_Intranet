@@ -51,9 +51,6 @@
       "target": "plugin::users-permissions.user",
       "inversedBy": "fiches"
     },
-    "siren": {
-      "type": "biginteger"
-    },
     "venduePar": {
       "type": "relation",
       "relation": "manyToOne",
@@ -73,6 +70,12 @@
       "type": "text"
     },
     "dateHeureRappel": {
+      "type": "string"
+    },
+    "siren": {
+      "type": "string"
+    },
+    "siret": {
       "type": "string"
     }
   }
