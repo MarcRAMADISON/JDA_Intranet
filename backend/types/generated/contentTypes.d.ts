@@ -475,6 +475,7 @@ export interface ApiFicheFiche extends Schema.CollectionType {
     siret: Attribute.String;
     siteWeb: Attribute.String;
     statut: Attribute.String;
+    statutJuridique: Attribute.String;
     telephoneStandard: Attribute.String;
     updatedAt: Attribute.DateTime;
     updatedBy: Attribute.Relation<

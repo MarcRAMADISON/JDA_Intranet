@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2025-03-10T09:11:57.104Z"
+    "x-generation-date": "2025-03-13T09:37:41.564Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -851,6 +851,9 @@
                                                     "type": "string"
                                                   },
                                                   "siret": {
+                                                    "type": "string"
+                                                  },
+                                                  "statutJuridique": {
                                                     "type": "string"
                                                   },
                                                   "createdAt": {
@@ -1875,6 +1878,9 @@
                                                                 "siret": {
                                                                   "type": "string"
                                                                 },
+                                                                "statutJuridique": {
+                                                                  "type": "string"
+                                                                },
                                                                 "createdAt": {
                                                                   "type": "string",
                                                                   "format": "date-time"
@@ -2318,6 +2324,9 @@
                 "type": "string"
               },
               "siret": {
+                "type": "string"
+              },
+              "statutJuridique": {
                 "type": "string"
               }
             }
@@ -2986,6 +2995,9 @@
                                     "siret": {
                                       "type": "string"
                                     },
+                                    "statutJuridique": {
+                                      "type": "string"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -3354,6 +3366,9 @@
             "type": "string"
           },
           "siret": {
+            "type": "string"
+          },
+          "statutJuridique": {
             "type": "string"
           },
           "createdAt": {

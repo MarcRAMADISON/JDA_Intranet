@@ -41,6 +41,7 @@ interface ficheFormType {
   siren: string;
   comment: string;
   siret:string;
+  statutJuridique:string;
 }
 
 const defaultValues = {
@@ -58,7 +59,8 @@ const defaultValues = {
   siteWeb: "",
   siren: "",
   comment: "",
-  siret:""
+  siret:"",
+  statutJuridique:""
 };
 
 /*interface AddFicheProps {
@@ -100,6 +102,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
         siren: row?.siren || "",
         comment: row?.comment || "",
         siret: row?.siret || '',
+        statutJuridique: row?.statutJuridique || ''
       });
 
       dayjs.extend(customParseFormat);
@@ -119,6 +122,8 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
       [event?.target.name]: event?.target.value,
     }));
   }, []);
+
+  console.log('values',values)
 
   const handleSave = (event: any) => {
     event.preventDefault();
@@ -163,6 +168,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
               venduePar: values.statut === "Vente OK" ? idUser : null,
               comment: values.comment,
               dateHeureRappel: date && dayjs(date).isValid() ? date.format("DD/MM/YYYY HH:mm") : null,
+              statutJuridique: values.statutJuridique
             },
           }),
         })
@@ -444,6 +450,15 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
               sx={{ width: "90%", mb: "10px" }}
               id="filled-basic"
               label="Siret"
+              variant="standard"
+              onChange={handleChange}
+            />
+             <TextField
+              value={values.statutJuridique}
+              name="statutJuridique"
+              sx={{ width: "90%", mb: "10px" }}
+              id="filled-basic"
+              label="Statut juridique"
               variant="standard"
               onChange={handleChange}
             />
