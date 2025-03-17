@@ -30,6 +30,7 @@ interface annuelDataObject {
 
 function IndividualStatistiques() {
   const [annuelData, setAnnuelData] = useState<annuelDataObject | undefined>();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [detailStatut, setDetailStatut] = useState<any>();
   const [search, setSearch] = useState<number>(new Date().getFullYear());
   const [userList, setUserList] =
