@@ -120,7 +120,7 @@ function IndividualStatistiques() {
     setAnnuelData({ data: [], statut: [], totalFicheAnnuel: 0 });
 
     getAnnualStat({ year: search, idUser: selectedUser.id, type: 'INDIVIDUAL' }).then((res) => {
-      if (res && currentStatut.length) {
+      if (res) {
         const data: monthlyDataObject[] = res.global.monthData.map((month) => ({
           label: month.label,
           nbFiche: month.nbFiche,
@@ -256,7 +256,7 @@ function IndividualStatistiques() {
             })}
           </Box>
         </Box>
-        <Typography
+        {/*<Typography
           color="primary"
           variant="h5"
           sx={{ mt: "100px", mb: "70px", fontWeight: "bold" }}
@@ -297,7 +297,7 @@ function IndividualStatistiques() {
           ) : (
             <></>
           )}
-        </Box></> : <Typography variant='body1' color='text.secondary'>L&apos;utilisateur n&apos;a pas encore créée de fiche pour le moment</Typography>}
+        </Box>*/}</> : <Typography variant='body1' color='text.secondary'>L&apos;utilisateur n&apos;a pas encore créée de fiche pour le moment</Typography>}
         {loading ? <Loader/> : <></>}
       </Box>
     </Box>

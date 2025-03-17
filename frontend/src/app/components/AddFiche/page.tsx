@@ -123,7 +123,6 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
     }));
   }, []);
 
-  console.log('values',values)
 
   const handleSave = (event: any) => {
     event.preventDefault();
