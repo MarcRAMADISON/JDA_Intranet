@@ -185,7 +185,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
         return;
       }
 
-      /*fetch(`${process.env.NEXT_PUBLIC_FRONT_API_URL}/api/createFiche`, {
+      fetch(`${process.env.NEXT_PUBLIC_FRONT_API_URL}/api/createFiche`, {
         method: "POST",
         headers: {
           "Content-type": "application/json; charset=UTF-8",
@@ -211,9 +211,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
             //setValues(defaultValues);
           }
         });
-        handleAddTextToSpecificPage({dataForm:data,currentLm:currentLm}).then((res)=>{
-          setPdfSrc(res.filePath)
-      });*/
+       
     }
   };
 
