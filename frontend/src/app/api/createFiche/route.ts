@@ -16,7 +16,7 @@ const createErrorResponse = (message: string,type:string) => {
   );
 };
 
-// Fonction pour gérer la méthode OPTIONS (CORS)
+
 export async function OPTIONS() {
   return new Response(null, {
     status: 204,
@@ -28,16 +28,15 @@ export async function OPTIONS() {
   });
 }
 
-// Fonction pour gérer la méthode POST (création de la fiche)
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  // Vérification des paramètres nécessaires dans le corps de la requête
+
   if (body?.telephoneStandard || body?.ligneDirecte) {
     const telephoneStandard = encodeURIComponent(body?.telephoneStandard);
     const ligneDirecte = encodeURIComponent(body?.ligneDirecte);
 
-    // Recherche d'une fiche existante avec les mêmes numéros de téléphone
+
     const searchUrl = `${
       process.env.NEXT_PUBLIC_URL
     }/api/fiches?filters[$or][0][telephoneStandard][$eq]=${
@@ -59,11 +58,11 @@ export async function POST(request: NextRequest) {
 
     const searchData = await searchResponse.json();
 
-    // Si une fiche existe déjà, renvoyer une erreur
+
     if (searchData?.data?.length) {
       return createErrorResponse("La fiche existe déjà avec les mêmes numéros de téléphone","ALREADY_EXISTS");
     } else {
-      // Sinon, créer une nouvelle fiche
+      
       const createResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/fiches`, {
         method: "POST",
         headers: {
@@ -76,7 +75,6 @@ export async function POST(request: NextRequest) {
 
       const createData = await createResponse.json();
 
-      // Si la création réussit, renvoyer la réponse de la fiche créée
       if (createData?.data) {
         return new Response(JSON.stringify({ ...createData?.data }), {
           status: 200,
@@ -88,12 +86,12 @@ export async function POST(request: NextRequest) {
           },
         });
       } else {
-        // En cas d'erreur lors de la création
+      
         return createErrorResponse("Erreur lors de la création de la fiche","ERROR");
       }
     }
   } else {
-    // Si les informations requises ne sont pas présentes
+    
     return createErrorResponse("Erreur lors de la création : informations manquantes","ERROR");
   }
 }

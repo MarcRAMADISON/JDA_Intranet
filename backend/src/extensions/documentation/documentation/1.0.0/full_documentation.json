@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2025-03-17T08:41:23.114Z"
+    "x-generation-date": "2025-06-13T08:12:30.203Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -854,6 +854,12 @@
                                                     "type": "string"
                                                   },
                                                   "statutJuridique": {
+                                                    "type": "string"
+                                                  },
+                                                  "ville": {
+                                                    "type": "string"
+                                                  },
+                                                  "codePostal": {
                                                     "type": "string"
                                                   },
                                                   "createdAt": {
@@ -1881,6 +1887,12 @@
                                                                 "statutJuridique": {
                                                                   "type": "string"
                                                                 },
+                                                                "ville": {
+                                                                  "type": "string"
+                                                                },
+                                                                "codePostal": {
+                                                                  "type": "string"
+                                                                },
                                                                 "createdAt": {
                                                                   "type": "string",
                                                                   "format": "date-time"
@@ -2327,6 +2339,12 @@
                 "type": "string"
               },
               "statutJuridique": {
+                "type": "string"
+              },
+              "ville": {
+                "type": "string"
+              },
+              "codePostal": {
                 "type": "string"
               }
             }
@@ -2998,6 +3016,12 @@
                                     "statutJuridique": {
                                       "type": "string"
                                     },
+                                    "ville": {
+                                      "type": "string"
+                                    },
+                                    "codePostal": {
+                                      "type": "string"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -3369,6 +3393,12 @@
             "type": "string"
           },
           "statutJuridique": {
+            "type": "string"
+          },
+          "ville": {
+            "type": "string"
+          },
+          "codePostal": {
             "type": "string"
           },
           "createdAt": {

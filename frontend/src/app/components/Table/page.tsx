@@ -187,6 +187,7 @@ export default function CustomTable({
         setReload={setReload}
         row={currentRow}
       />
+     
       <TableContainer component={Paper} sx={{overflowX:"visible"}}>
         <Table >
           <TableHead>

@@ -364,3 +364,24 @@ export const getAnnualStat = ({
 
     });
 };
+
+export const defaultValues = {
+  responsable: "",
+  localisation: "",
+  secteurActivite: "",
+  etablissement: "",
+  email: "",
+  ligneDirecte: "",
+  statut: "",
+  telephoneStandard: "",
+  nbEtoile: 0,
+  reseauxSociaux: "",
+  nbFollowers: "",
+  siteWeb: "",
+  siren: "",
+  comment: "",
+  siret: "",
+  statutJuridique: "",
+  codePostal:"",
+  ville:""
+};

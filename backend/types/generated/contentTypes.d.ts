@@ -452,6 +452,7 @@ export interface ApiFicheFiche extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
+    codePostal: Attribute.String;
     comment: Attribute.Text;
     createdAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -499,6 +500,7 @@ export interface ApiFicheFiche extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
+    ville: Attribute.String;
   };
 }
 

@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import CustomModal from "../Modal/page";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Cookies from "js-cookie";
 import { Check } from "@mui/icons-material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
@@ -23,6 +23,8 @@ import { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 
 import "dayjs/locale/fr";
+import SendMissionLetterForm from "../sendMissionLetterForm/page";
+import { defaultValues } from "@/app/utils";
 
 interface ficheFormType {
   id?: number;
@@ -40,28 +42,13 @@ interface ficheFormType {
   siteWeb: string;
   siren: string;
   comment: string;
-  siret:string;
-  statutJuridique:string;
+  siret: string;
+  statutJuridique: string;
+  codePostal: string;
+  ville:string;
 }
 
-const defaultValues = {
-  responsable: "",
-  localisation: "",
-  secteurActivite: "",
-  etablissement: "",
-  email: "",
-  ligneDirecte: "",
-  statut: "",
-  telephoneStandard: "",
-  nbEtoile: 0,
-  reseauxSociaux: "",
-  nbFollowers: "",
-  siteWeb: "",
-  siren: "",
-  comment: "",
-  siret:"",
-  statutJuridique:""
-};
+
 
 /*interface AddFicheProps {
   row?: ficheFormType;
@@ -77,6 +64,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
   >("HIDE");
   const [userType, setUserType] = useState<"ADMIN" | "AGENT">("AGENT");
   const [date, setDate] = useState<Dayjs | null>(null);
+  const [openModalSendLM, setOpenModalSendLM] = useState<boolean>(false);
 
   useEffect(() => {
     const user = Cookies.get("user");
@@ -101,13 +89,19 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
         siteWeb: row?.siteWeb || "",
         siren: row?.siren || "",
         comment: row?.comment || "",
-        siret: row?.siret || '',
-        statutJuridique: row?.statutJuridique || ''
+        siret: row?.siret || "",
+        statutJuridique: row?.statutJuridique || "",
+        codePostal: row?.codePostal || "",
+        ville: row?.ville || ''
       });
 
       dayjs.extend(customParseFormat);
 
-      setDate(row?.dateHeureRappel? dayjs(row?.dateHeureRappel, "DD/MM/YYYY HH:mm") : null);
+      setDate(
+        row?.dateHeureRappel
+          ? dayjs(row?.dateHeureRappel, "DD/MM/YYYY HH:mm")
+          : null
+      );
 
       setShowMessage("HIDE");
     }
@@ -115,14 +109,12 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
     dayjs.locale("fr");
   }, [row, setValues]);
 
-
   const handleChange = useCallback((event: any) => {
     setValues((prev) => ({
       ...prev,
       [event?.target.name]: event?.target.value,
     }));
   }, []);
-
 
   const handleSave = (event: any) => {
     event.preventDefault();
@@ -166,18 +158,24 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
               siret: values.siret,
               venduePar: values.statut === "Vente OK" ? idUser : null,
               comment: values.comment,
-              dateHeureRappel: date && dayjs(date).isValid() ? date.format("DD/MM/YYYY HH:mm") : null,
-              statutJuridique: values.statutJuridique
+              dateHeureRappel:
+                date && dayjs(date).isValid()
+                  ? date.format("DD/MM/YYYY HH:mm")
+                  : null,
+              statutJuridique: values.statutJuridique,
+              codePostal: values.codePostal,
+              ville: values.ville
             },
           }),
         })
           .then((res) => res.json())
           .then((res) => {
             if (res.data) {
-              setValues(defaultValues);
               setShowMessage("SUCCESS");
               setReload((prev: any) => !prev);
               setOpenModal(false);
+              setOpenModalSendLM(true);
+              //setValues(defaultValues);
             } else {
               setShowMessage("ERROR");
             }
@@ -187,7 +185,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
         return;
       }
 
-      fetch(`${process.env.NEXT_PUBLIC_FRONT_API_URL}/api/createFiche`, {
+      /*fetch(`${process.env.NEXT_PUBLIC_FRONT_API_URL}/api/createFiche`, {
         method: "POST",
         headers: {
           "Content-type": "application/json; charset=UTF-8",
@@ -208,10 +206,14 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
             setShowMessage("ERROR");
           } else {
             setShowMessage("SUCCESS");
-            setValues(defaultValues);
             setReload((prev: any) => !prev);
+            setOpenModalSendLM(true);
+            //setValues(defaultValues);
           }
         });
+        handleAddTextToSpecificPage({dataForm:data,currentLm:currentLm}).then((res)=>{
+          setPdfSrc(res.filePath)
+      });*/
     }
   };
 
@@ -221,219 +223,249 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
     return pattern.test(email);
   }, []);
 
+  const data: ficheFormType = useMemo(() => {
+    let intermediateData: ficheFormType = defaultValues;
+
+    const keys = Object.keys(row || {});
+
+    if (keys.length) {
+      keys.map((key: string) => {
+        if (values && (values as any)[key]) {
+          intermediateData = {
+            ...intermediateData,
+            [key]: (values as any)[key],
+          };
+        }
+      });
+    } else if (
+      values.etablissement &&
+      values.secteurActivite &&
+      (values.telephoneStandard || values.ligneDirecte)
+    ) {
+      intermediateData = values;
+    }
+
+    return intermediateData;
+  }, [row, values]);
+
+
   return (
-    <CustomModal
-      style={{ width: "600px", height: "fit-content" }}
-      open={openModal}
-      setOpen={setOpenModal}
-    >
-      <Typography
-        sx={{ mb: "30px" }}
-        id="modal-modal-title"
-        variant="h4"
-        component="h1"
-        color="primary"
+    <>
+      <SendMissionLetterForm
+        data={data}
+        openModal={openModalSendLM}
+        setOpenModal={setOpenModalSendLM}
+        setValues={setValues}
+      />
+      <CustomModal
+        style={{ width: "920px", height: "fit-content" }}
+        open={openModal}
+        setOpen={setOpenModal}
       >
-        {row ? "Modifier fiche" : "Nouvelle fiche"}
-      </Typography>
-      {showMessage === "SUCCESS" ? (
-        <Alert severity="success" sx={{ mb: "20px" }}>
-          Fiche enregistrée
-        </Alert>
-      ) : showMessage === "ERROR" ? (
-        <Alert severity="error" sx={{ mb: "20px" }}>
-          Problème lors de l&apos;enregistrement du fiche
-        </Alert>
-      ) : showMessage === "ALREADY_EXISTS" ? (
-        <Alert severity="error" sx={{ mb: "20px" }}>
-          La fiche existe déjà dans la base de donnée
-        </Alert>
-      ) : (
-        <></>
-      )}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2,1fr)",
-          gap: "30px",
-          width: "100%",
-        }}
-      >
-        <TextField
-          value={values.responsable}
-          name="responsable"
-          sx={{ width: "90%", mb: "10px" }}
-          id="filled-basic"
-          label="Responsable"
-          variant="standard"
-          onChange={handleChange}
-        />
-        <TextField
-          value={values.etablissement}
-          name="etablissement"
-          sx={{ width: "90%", mb: "10px" }}
-          id="filled-basic"
-          label="Nom de l'établissement *"
-          variant="standard"
-          onChange={handleChange}
-        />
-        <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">
-            Sécteur d&apos;activité *
-          </InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={values.secteurActivite}
-            name="secteurActivite"
-            label="Secteur d'activité"
-            onChange={handleChange}
-            sx={{ width: "90%", mb: "10px" }}
-          >
-            <MenuItem value="Restaurant">Restaurant</MenuItem>
-            <MenuItem value="Hotel">Hotel</MenuItem>
-            <MenuItem value="Salon de coiffure">Salon de coiffure</MenuItem>
-            <MenuItem value="Institue de bien être">
-              Institue de bien être
-            </MenuItem>
-            <MenuItem value="Autre">Autre</MenuItem>={" "}
-          </Select>
-        </FormControl>
-        <TextField
-          value={values.localisation}
-          name="localisation"
-          sx={{ width: "90%", mb: "10px" }}
-          id="filled-basic"
-          label="Localisation"
-          variant="standard"
-          onChange={handleChange}
-        />
-        <TextField
-          value={values.telephoneStandard}
-          name="telephoneStandard"
-          sx={{ width: "90%", mb: "10px" }}
-          id="filled-basic"
-          label="Numero téléphone *"
-          variant="standard"
-          onChange={handleChange}
-        />
-        <TextField
-          value={values.ligneDirecte}
-          name="ligneDirecte"
-          sx={{ width: "90%", mb: "10px" }}
-          id="filled-basic"
-          label="Ligne directe *"
-          variant="standard"
-          onChange={handleChange}
-        />
-        <TextField
-          value={values.email}
-          name="email"
-          sx={{ width: "90%", mb: "10px" }}
-          id="filled-basic"
-          label="Adresse e-mail"
-          variant="standard"
-          onChange={handleChange}
-          color={
-            values.email && !validateEmail(values.email) ? "error" : undefined
-          }
-        />
-        <TextField
-          value={values.reseauxSociaux}
-          name="reseauxSociaux"
-          sx={{ width: "90%", mb: "10px" }}
-          id="filled-basic"
-          label="Réseaux sociaux"
-          variant="standard"
-          onChange={handleChange}
-        />
-        <TextField
-          value={values.nbEtoile}
-          name="nbEtoile"
-          sx={{ width: "90%", mb: "10px" }}
-          id="filled-basic"
-          label="Nombre d'étoile"
-          variant="standard"
-          onChange={handleChange}
-          type="number"
-        />
-        <TextField
-          value={values.nbFollowers}
-          name="nbFollowers"
-          sx={{ width: "90%", mb: "10px" }}
-          id="filled-basic"
-          label="Nombre de followers"
-          variant="standard"
-          onChange={handleChange}
-        />
-        <TextField
-          value={values.siteWeb}
-          name="siteWeb"
-          sx={{ width: "90%", mb: "10px" }}
-          id="filled-basic"
-          label="Site web"
-          variant="standard"
-          onChange={handleChange}
-        />
-        <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Statut *</InputLabel>
-          {userType === "ADMIN" ? (
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={values.statut}
-              name="statut"
-              label="Type d'établissement"
-              onChange={handleChange}
-              sx={{ width: "90%", mb: "10px" }}
-            >
-              <MenuItem value="Nouveau">Nouveau</MenuItem>
-              <MenuItem value="Injoignable">Injoignable</MenuItem>
-              <MenuItem value="Ne répond pas">Ne répond pas</MenuItem>
-              <MenuItem value="A rappeler">A rappeler</MenuItem>
-              <MenuItem value="Ne plus appeler">Ne plus appeler</MenuItem>
-              <MenuItem value="Hors cible">Hors cible</MenuItem>
-              <MenuItem value="Faux numéro">Faux numéro</MenuItem>
-              <MenuItem value="A signer">A signer</MenuItem>
-              <MenuItem value="Vente OK">Vente OK</MenuItem>
-            </Select>
-          ) : (
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={values.statut}
-              name="statut"
-              label="Type d'établissement"
-              onChange={handleChange}
-              sx={{ width: "90%", mb: "10px" }}
-            >
-              <MenuItem value="A rappeler">A rappeler</MenuItem>
-              <MenuItem value="A signer">A signer</MenuItem>
-            </Select>
-          )}
-        </FormControl>
-        {values.statut === "Vente OK" && (
+        <Typography
+          sx={{ mb: "50px" }}
+          id="modal-modal-title"
+          variant="h4"
+          component="h1"
+          color="primary"
+        >
+          {row ? "Modifier fiche" : "Nouvelle fiche"}
+        </Typography>
+        {showMessage === "SUCCESS" ? (
+          <Alert severity="success" sx={{ mb: "20px" }}>
+            Fiche enregistrée
+          </Alert>
+        ) : showMessage === "ERROR" ? (
+          <Alert severity="error" sx={{ mb: "20px" }}>
+            Problème lors de l&apos;enregistrement du fiche
+          </Alert>
+        ) : showMessage === "ALREADY_EXISTS" ? (
+          <Alert severity="error" sx={{ mb: "20px" }}>
+            La fiche existe déjà dans la base de donnée
+          </Alert>
+        ) : (
+          <></>
+        )}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3,1fr)",
+            gap: "30px",
+            width: "100%",
+          }}
+        >
           <TextField
-            value={values.siren}
-            name="siren"
+            value={values.responsable}
+            name="responsable"
             sx={{ width: "90%", mb: "10px" }}
             id="filled-basic"
-            label="Siren"
+            label="Responsable"
             variant="standard"
             onChange={handleChange}
           />
-        )}
-        {values.statut === "A rappeler" && (
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="fr">
-            <DateTimePicker
-              label="Date et Heure de rappel"
-              value={date}
-              onChange={(newValue) => setDate(newValue)}
-            />
-          </LocalizationProvider>
-        )}
-        {values.statut === "A signer" && (
-          <>
+          <TextField
+            value={values.etablissement}
+            name="etablissement"
+            sx={{ width: "90%", mb: "10px" }}
+            id="filled-basic"
+            label="Nom de l'établissement *"
+            variant="standard"
+            onChange={handleChange}
+          />
+          <FormControl fullWidth>
+            <InputLabel id="demo-simple-select-label">
+              Sécteur d&apos;activité *
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={values.secteurActivite}
+              name="secteurActivite"
+              label="Secteur d'activité"
+              onChange={handleChange}
+              sx={{ width: "90%", mb: "10px" }}
+            >
+              <MenuItem value="Restaurant">Restaurant</MenuItem>
+              <MenuItem value="Hotel">Hotel</MenuItem>
+              <MenuItem value="Salon de coiffure">Salon de coiffure</MenuItem>
+              <MenuItem value="Institue de bien être">
+                Institue de bien être
+              </MenuItem>
+              <MenuItem value="Autre">Autre</MenuItem>={" "}
+            </Select>
+          </FormControl>
+          <TextField
+            value={values.localisation}
+            name="localisation"
+            sx={{ width: "90%", mb: "10px" }}
+            id="filled-basic"
+            label="Localisation ( Siège social )"
+            variant="standard"
+            onChange={handleChange}
+          />
+          <TextField
+            value={values.ville}
+            name="ville"
+            sx={{ width: "90%", mb: "10px" }}
+            id="filled-basic"
+            label="Ville"
+            variant="standard"
+            onChange={handleChange}
+          />
+          <TextField
+            value={values.codePostal}
+            name="codePostal"
+            sx={{ width: "90%", mb: "10px" }}
+            id="filled-basic"
+            label="Code postal"
+            variant="standard"
+            onChange={handleChange}
+          />
+          <TextField
+            value={values.telephoneStandard}
+            name="telephoneStandard"
+            sx={{ width: "90%", mb: "10px" }}
+            id="filled-basic"
+            label="Numero téléphone *"
+            variant="standard"
+            onChange={handleChange}
+          />
+          <TextField
+            value={values.ligneDirecte}
+            name="ligneDirecte"
+            sx={{ width: "90%", mb: "10px" }}
+            id="filled-basic"
+            label="Ligne directe *"
+            variant="standard"
+            onChange={handleChange}
+          />
+          <TextField
+            value={values.email}
+            name="email"
+            sx={{ width: "90%", mb: "10px" }}
+            id="filled-basic"
+            label="Adresse e-mail"
+            variant="standard"
+            onChange={handleChange}
+            color={
+              values.email && !validateEmail(values.email) ? "error" : undefined
+            }
+          />
+          <TextField
+            value={values.reseauxSociaux}
+            name="reseauxSociaux"
+            sx={{ width: "90%", mb: "10px" }}
+            id="filled-basic"
+            label="Réseaux sociaux"
+            variant="standard"
+            onChange={handleChange}
+          />
+          <TextField
+            value={values.nbEtoile}
+            name="nbEtoile"
+            sx={{ width: "90%", mb: "10px" }}
+            id="filled-basic"
+            label="Nombre d'étoile"
+            variant="standard"
+            onChange={handleChange}
+            type="number"
+          />
+          <TextField
+            value={values.nbFollowers}
+            name="nbFollowers"
+            sx={{ width: "90%", mb: "10px" }}
+            id="filled-basic"
+            label="Nombre de followers"
+            variant="standard"
+            onChange={handleChange}
+          />
+          <TextField
+            value={values.siteWeb}
+            name="siteWeb"
+            sx={{ width: "90%", mb: "10px" }}
+            id="filled-basic"
+            label="Site web"
+            variant="standard"
+            onChange={handleChange}
+          />
+          <FormControl fullWidth>
+            <InputLabel id="demo-simple-select-label">Statut *</InputLabel>
+            {userType === "ADMIN" ? (
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={values.statut}
+                name="statut"
+                label="Type d'établissement"
+                onChange={handleChange}
+                sx={{ width: "90%", mb: "10px" }}
+              >
+                <MenuItem value="Nouveau">Nouveau</MenuItem>
+                <MenuItem value="Injoignable">Injoignable</MenuItem>
+                <MenuItem value="Ne répond pas">Ne répond pas</MenuItem>
+                <MenuItem value="A rappeler">A rappeler</MenuItem>
+                <MenuItem value="Ne plus appeler">Ne plus appeler</MenuItem>
+                <MenuItem value="Hors cible">Hors cible</MenuItem>
+                <MenuItem value="Faux numéro">Faux numéro</MenuItem>
+                <MenuItem value="A signer">A signer</MenuItem>
+                <MenuItem value="Vente OK">Vente OK</MenuItem>
+              </Select>
+            ) : (
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={values.statut}
+                name="statut"
+                label="Type d'établissement"
+                onChange={handleChange}
+                sx={{ width: "90%", mb: "10px" }}
+              >
+                <MenuItem value="A rappeler">A rappeler</MenuItem>
+                <MenuItem value="A signer">A signer</MenuItem>
+              </Select>
+            )}
+          </FormControl>
+          {values.statut === "Vente OK" && (
             <TextField
               value={values.siren}
               name="siren"
@@ -443,52 +475,74 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
               variant="standard"
               onChange={handleChange}
             />
-            <TextField
-              value={values.siret}
-              name="siret"
-              sx={{ width: "90%", mb: "10px" }}
-              id="filled-basic"
-              label="Siret"
-              variant="standard"
-              onChange={handleChange}
-            />
-             <TextField
-              value={values.statutJuridique}
-              name="statutJuridique"
-              sx={{ width: "90%", mb: "10px" }}
-              id="filled-basic"
-              label="Statut juridique"
-              variant="standard"
-              onChange={handleChange}
-            />
-          </>
-        )}
-        <TextField
-          id="outlined-multiline-static"
-          label="Commentaire"
-          name="comment"
-          multiline
-          rows={4}
-          value={values.comment}
-          onChange={handleChange}
-        />
-      </Box>
+          )}
+          {values.statut === "A rappeler" && (
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="fr">
+              <DateTimePicker
+                label="Date et Heure de rappel"
+                value={date}
+                onChange={(newValue) => setDate(newValue)}
+              />
+            </LocalizationProvider>
+          )}
+          {values.statut === "A signer" && (
+            <>
+              <TextField
+                value={values.siren}
+                name="siren"
+                sx={{ width: "90%", mb: "10px" }}
+                id="filled-basic"
+                label="Siren"
+                variant="standard"
+                onChange={handleChange}
+              />
+              <TextField
+                value={values.siret}
+                name="siret"
+                sx={{ width: "90%", mb: "10px" }}
+                id="filled-basic"
+                label="Siret"
+                variant="standard"
+                onChange={handleChange}
+              />
+              <TextField
+                value={values.statutJuridique}
+                name="statutJuridique"
+                sx={{ width: "90%", mb: "10px" }}
+                id="filled-basic"
+                label="Statut juridique"
+                variant="standard"
+                onChange={handleChange}
+              />
+            </>
+          )}
+          <TextField
+            id="outlined-multiline-static"
+            label="Commentaire"
+            name="comment"
+            multiline
+            rows={4}
+            value={values.comment}
+            onChange={handleChange}
+          />
+        </Box>
 
-      <Button
-        sx={{ mt: "30px" }}
-        startIcon={<Check />}
-        variant="contained"
-        onClick={handleSave}
-        disabled={
-          !values.etablissement ||
-          !values.secteurActivite ||
-          !values.statut ||
-          (!values.telephoneStandard && !values.ligneDirecte)
-        }
-      >
-        Enregistrer
-      </Button>
-    </CustomModal>
+        <Button
+          sx={{ mt: "50px" }}
+          startIcon={<Check />}
+          variant="contained"
+          onClick={handleSave}
+          disabled={
+            !values.etablissement ||
+            !values.secteurActivite ||
+            !values.statut ||
+            (!values.telephoneStandard && !values.ligneDirecte)
+          }
+        >
+          Enregistrer
+        </Button>
+      </CustomModal>
+    </>
   );
 }
 
