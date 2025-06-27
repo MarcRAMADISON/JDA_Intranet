@@ -24,7 +24,7 @@ import dayjs from "dayjs";
 
 import "dayjs/locale/fr";
 import SendMissionLetterForm from "../sendMissionLetterForm/page";
-import { defaultValues } from "@/app/utils";
+import { defaultValues, handleAddTextToSpecificPage } from "@/app/utils";
 
 interface ficheFormType {
   id?: number;
@@ -65,6 +65,10 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
   const [userType, setUserType] = useState<"ADMIN" | "AGENT">("AGENT");
   const [date, setDate] = useState<Dayjs | null>(null);
   const [openModalSendLM, setOpenModalSendLM] = useState<boolean>(false);
+  const [pdfSrc,setPdfSrc]=useState<string>();
+  const [currentLm, setCurrentLm] = useState<string>("access");
+
+
 
   useEffect(() => {
     const user = Cookies.get("user");
@@ -118,6 +122,10 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
 
   const handleSave = (event: any) => {
     event.preventDefault();
+
+    handleAddTextToSpecificPage({dataForm:data,currentLm:currentLm}).then((res:any)=>{
+      setPdfSrc(res.filePath)
+    });
 
     if (
       values.etablissement &&
@@ -174,7 +182,9 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
               setShowMessage("SUCCESS");
               setReload((prev: any) => !prev);
               setOpenModal(false);
-              setOpenModalSendLM(true);
+              if (values?.statut === "A signer") {
+                setOpenModalSendLM(true);
+              }
               //setValues(defaultValues);
             } else {
               setShowMessage("ERROR");
@@ -207,12 +217,18 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
           } else {
             setShowMessage("SUCCESS");
             setReload((prev: any) => !prev);
-            setOpenModalSendLM(true);
+            if (values?.statut === "A signer") {
+              setOpenModalSendLM(true);
+            }
             //setValues(defaultValues);
           }
         });
        
+       
+
     }
+
+    
   };
 
   const validateEmail = useCallback((email: string) => {
@@ -246,6 +262,14 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
     return intermediateData;
   }, [row, values]);
 
+  const checkValidity= !values.etablissement ||
+  !values.secteurActivite ||
+  !values.statut ||
+  !values.codePostal ||
+  !values.email || 
+  !values.localisation ||
+  !values.responsable ||
+  (!values.telephoneStandard && !values.ligneDirecte)
 
   return (
     <>
@@ -254,6 +278,10 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
         openModal={openModalSendLM}
         setOpenModal={setOpenModalSendLM}
         setValues={setValues}
+        pdfSrc={pdfSrc}
+        currentLm={currentLm}
+        setCurrentLm={setCurrentLm}
+        setPdfSrc={setPdfSrc}
       />
       <CustomModal
         style={{ width: "920px", height: "fit-content" }}
@@ -297,7 +325,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
             name="responsable"
             sx={{ width: "90%", mb: "10px" }}
             id="filled-basic"
-            label="Responsable"
+            label="Responsable *"
             variant="standard"
             onChange={handleChange}
           />
@@ -319,7 +347,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
               id="demo-simple-select"
               value={values.secteurActivite}
               name="secteurActivite"
-              label="Secteur d'activité"
+              label="Secteur d'activité *"
               onChange={handleChange}
               sx={{ width: "90%", mb: "10px" }}
             >
@@ -337,7 +365,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
             name="localisation"
             sx={{ width: "90%", mb: "10px" }}
             id="filled-basic"
-            label="Localisation ( Siège social )"
+            label="Localisation ( Siège social ) *"
             variant="standard"
             onChange={handleChange}
           />
@@ -346,7 +374,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
             name="ville"
             sx={{ width: "90%", mb: "10px" }}
             id="filled-basic"
-            label="Ville"
+            label="Ville *"
             variant="standard"
             onChange={handleChange}
           />
@@ -355,7 +383,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
             name="codePostal"
             sx={{ width: "90%", mb: "10px" }}
             id="filled-basic"
-            label="Code postal"
+            label="Code postal *"
             variant="standard"
             onChange={handleChange}
           />
@@ -382,7 +410,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
             name="email"
             sx={{ width: "90%", mb: "10px" }}
             id="filled-basic"
-            label="Adresse e-mail"
+            label="Adresse e-mail *"
             variant="standard"
             onChange={handleChange}
             color={
@@ -469,7 +497,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
               name="siren"
               sx={{ width: "90%", mb: "10px" }}
               id="filled-basic"
-              label="Siren"
+              label="Siren *"
               variant="standard"
               onChange={handleChange}
             />
@@ -490,7 +518,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
                 name="siren"
                 sx={{ width: "90%", mb: "10px" }}
                 id="filled-basic"
-                label="Siren"
+                label="Siren *"
                 variant="standard"
                 onChange={handleChange}
               />
@@ -499,7 +527,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
                 name="siret"
                 sx={{ width: "90%", mb: "10px" }}
                 id="filled-basic"
-                label="Siret"
+                label="Siret *"
                 variant="standard"
                 onChange={handleChange}
               />
@@ -508,7 +536,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
                 name="statutJuridique"
                 sx={{ width: "90%", mb: "10px" }}
                 id="filled-basic"
-                label="Statut juridique"
+                label="Statut juridique *"
                 variant="standard"
                 onChange={handleChange}
               />
@@ -530,12 +558,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
           startIcon={<Check />}
           variant="contained"
           onClick={handleSave}
-          disabled={
-            !values.etablissement ||
-            !values.secteurActivite ||
-            !values.statut ||
-            (!values.telephoneStandard && !values.ligneDirecte)
-          }
+          disabled={checkValidity}
         >
           Enregistrer
         </Button>

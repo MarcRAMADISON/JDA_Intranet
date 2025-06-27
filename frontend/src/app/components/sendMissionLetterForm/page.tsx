@@ -2,7 +2,7 @@
 
 import { useState, SetStateAction, Dispatch, useEffect } from "react";
 import CustomModal from "../Modal/page";
-import { defaultValues } from "@/app/utils";
+import { defaultValues, deleteFile, handleAddTextToSpecificPage } from "@/app/utils";
 import {
   Button,
   FormControl,
@@ -11,197 +11,61 @@ import {
   RadioGroup,
   Typography,
 } from "@mui/material";
-import { PDFDocument, rgb } from "pdf-lib";
-import moment from "moment";
+import Swal from "sweetalert2";
 
 interface FormData {
-  fileUrl: string;
+  fileName: string;
   signerEmail: string;
   signerName: string;
+  currentLm: string;
 }
-
-const handleAddTextToSpecificPage = async ({dataForm,currentLm}:{dataForm:any,currentLm:string}) => {
-  const file= currentLm === "access"? `/assets/lmAccess.pdf` : `/assets/lmPremium.pdf`
-  const existingPdfBytes = await fetch(file).then((res) =>
-    res.arrayBuffer()
-  );
-
-  const pdfDoc = await PDFDocument.load(existingPdfBytes);
-
-  const secondPage = pdfDoc.getPages()[1];
-  const endPage = pdfDoc.getPages()[7];
-
-  const keys: any = Object.keys(dataForm);
-
-  const font = await pdfDoc.embedFont("Helvetica");
-  const textSize = 12;
-
-  const listForm = [
-    "etablissement",
-    "statutJuridique",
-    "localisation",
-    "siret",
-    "responsable",
-    "email",
-    "ligneDirecte",
-    "codePostal",
-    "ville",
-  ];
-
-  (keys || [])
-    .filter((k: string) => listForm.includes(k))
-    .map(async (key: string) => {
-      let xPosition;
-      let yPosition;
-      let dbXPosition;
-      let dbYPosition;
-
-      switch (key) {
-        case "etablissement":
-          xPosition = 130;
-          yPosition = 730;
-          break;
-        case "statutJuridique":
-          xPosition = 180;
-          yPosition = 700;
-          break;
-        case "localisation":
-          xPosition = 220;
-          yPosition = 670;
-          break;
-        case "ville":
-          xPosition = 130;
-          yPosition = 645;
-          break;
-        case "codePostal":
-          xPosition = 170;
-          yPosition = 615;
-          break;
-        case "siret":
-          xPosition = 200;
-          yPosition = 585;
-          break;
-        case "responsable":
-          xPosition = 130;
-          yPosition = 455;
-          dbXPosition = 145;
-          dbYPosition = 425;
-          break;
-        case "email":
-          xPosition = 170;
-          yPosition = 397;
-          break;
-        case "ligneDirecte":
-          xPosition = 220;
-          yPosition = 370;
-          break;
-      }
-
-      if (dbXPosition && dbYPosition) {
-        secondPage.drawText(`${dataForm[key]}`, {
-          x: dbXPosition,
-          y: dbYPosition,
-          font,
-          size: textSize,
-          color: rgb(0, 0, 0),
-        });
-      }
-
-      secondPage.drawText(`${dataForm[key]}`, {
-        x: xPosition,
-        y: yPosition,
-        font,
-        size: textSize,
-        color: rgb(0, 0, 0),
-      });
-    });
-
-  secondPage.drawText(
-    `${moment().add(1, "M").startOf("M").format("DD/MM/YYYY")}`,
-    {
-      x: 240,
-      y: 240,
-      font,
-      size: textSize,
-      color: rgb(0, 0, 0),
-    }
-  );
-
-  endPage.drawText(`${dataForm["responsable"]}`, {
-    x: 220,
-    y: 270,
-    font,
-    size: textSize,
-    color: rgb(0, 0, 0),
-  });
-
-  endPage.drawText(`${moment().format("DD/MM/YYYY")}`, {
-    x: 240,
-    y: 210,
-    font,
-    size: textSize,
-    color: rgb(0, 0, 0),
-  });
-
-  const pdfBytes = await pdfDoc.save();
-
-  const pdfBase64 = Buffer.from(pdfBytes).toString("base64");
-
-  const response = await fetch(`/api/save-pdf`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ pdf: pdfBase64 }),
-  })
-
-  const data = await response.json();
-  
-  return data
-};
 
 export default function SendMissionLetterForm({
   data,
   openModal,
   setOpenModal,
   setValues,
+  pdfSrc,
+  setPdfSrc,
+  currentLm,
+  setCurrentLm,
 }: {
   openModal: boolean;
   setOpenModal: Dispatch<SetStateAction<boolean>>;
   setValues: Dispatch<SetStateAction<any>>;
   data: any;
+  pdfSrc: string | undefined;
+  setPdfSrc: any;
+  currentLm: string;
+  setCurrentLm: any;
 }) {
   const [formData, setFormData] = useState<FormData>({
-    fileUrl:
-      "https://drive.google.com/file/d/1xNgg1kAfhZWbdJb-m8JD_1Y4taCKsATo/view?usp=drive_link",
+    fileName: "",
     signerEmail: "",
     signerName: "",
+    currentLm: "",
   });
   const [statusMessage, setStatusMessage] = useState<string>("");
-  const [currentLm, setCurrentLm] = useState<string>("access");
-  const [pdfSrc,setPdfSrc]=useState<string>();
-
-    
+  const [loading,setLoading]=useState<boolean>(false);
 
   useEffect(() => {
-    if (data)
+    if (data && pdfSrc && currentLm) {
+      const normalizedPath = pdfSrc.replace(/\\/g, "/");
+      const fileName = normalizedPath?.split("/").pop();
+
       setFormData((prev) => ({
         ...prev,
+        fileName: fileName || "",
         signerEmail: data.email,
-        signerName: data.responsable,
+        signerName: `${data.responsable} - ${currentLm}`,
+        currentLm: currentLm.toUpperCase(),
       }));
-  }, [data]);
-
-  useEffect(() => {
-    if (data.status) {
-      handleAddTextToSpecificPage({dataForm:data,currentLm:currentLm}).then((res)=>{
-          setPdfSrc(res.filePath)
-      });
     }
-  }, [data,currentLm]);
+  }, [data, pdfSrc, currentLm]);
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
+    setLoading(true)
 
     setStatusMessage("Envoi en cours...");
 
@@ -218,17 +82,35 @@ export default function SendMissionLetterForm({
       const data = await response.json();
 
       if (response.ok) {
-        setStatusMessage(
-          `Document envoyé à signer, ID de la demande : ${data.requestId}`
-        );
-        await fetch('/api/delete-pdf', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ filename: 'modified13062025120905.pdf' }),
+        Swal.fire({
+          title: "Document envoyé à signer",
+          text: `Document envoyé à signer, ID de la demande : ${data.id}`,
+          icon: "success"
         });
+        setFormData({
+          fileName: "",
+          signerEmail: "",
+          signerName: "",
+          currentLm: "",
+        })
+        setOpenModal(false)
+
+        setStatusMessage(
+          `Document envoyé à signer, ID de la demande : ${data.id}`
+        );
+        deleteFile(pdfSrc)
       } else {
+        Swal.fire({
+          title: "Document non envoyé",
+          text: "Erreur lors de l'envoi du document à signer.",
+          icon: "error"
+        });
+        setOpenModal(false)
         setStatusMessage("Erreur lors de l'envoi du document à signer.");
       }
+
+      setCurrentLm('access')
+      setLoading(false)
 
       setValues(defaultValues);
     } catch (error) {
@@ -236,7 +118,6 @@ export default function SendMissionLetterForm({
       setStatusMessage("Erreur lors de l'envoi du document à signer.");
     }
   };
-
 
   return (
     <CustomModal
@@ -250,7 +131,17 @@ export default function SendMissionLetterForm({
           aria-labelledby="demo-row-radio-buttons-group-label"
           name="controlled-radio-buttons-group"
           value={currentLm}
-          onChange={(e) => setCurrentLm(e.target.value)}
+          onChange={(e) => {
+                deleteFile(pdfSrc)
+                handleAddTextToSpecificPage({
+                  dataForm: data,
+                  currentLm: e.target.value,
+                }).then((res: any) => {
+                  setPdfSrc(res.filePath);
+                });
+                setCurrentLm(e.target.value);
+             
+          }}
         >
           <FormControlLabel
             sx={{ color: "#000" }}
@@ -268,13 +159,13 @@ export default function SendMissionLetterForm({
       </FormControl>
 
       <iframe
-        src={`${pdfSrc}`} 
+        src={`${pdfSrc}`}
         width="100%"
         height="750px"
         style={{ border: "none" }}
       ></iframe>
 
-      <Button sx={{ mt: "20px" }} variant="contained" onClick={handleSubmit}>
+      <Button sx={{ mt: "20px" }} disabled={loading} variant="contained" onClick={handleSubmit}>
         Envoyer à signer
       </Button>
 

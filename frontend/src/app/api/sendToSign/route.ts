@@ -1,48 +1,125 @@
-// src/app/api/sendToSign/route.ts
+import { NextRequest } from 'next/server';
+import axios from 'axios';
+import FormData from 'form-data';
+import fs from 'fs/promises';
+import path from 'path';
 
-export async function POST(req: Request) {
+const BASE_URL = 'https://api-sandbox.yousign.app/v3';
+const API_KEY = process.env.YOUSIGN_API_KEY || 'REPLACE_WITH_YOUR_API_KEY';
+
+const request = async (endpoint: string, options: any = {}, headers: any = {}) => {
+  const url = `${BASE_URL}/${endpoint}`;
+  const config = {
+    url,
+    headers: {
+      Authorization: `Bearer ${API_KEY}`,
+      ...headers,
+    },
+    ...options,
+  };
+
   try {
-    const { fileUrl, signerEmail, signerName } = await req.json();
-    
-    const apiKey = process.env.YOUSIGN_API_KEY;
-    const apiUrl = 'https://api.yousign.com/v1/requests';
+    const res = await axios(config);
+    return res.data;
+  } catch (e: any) {
+    console.error(`Erreur API [${endpoint}] :`, e.response?.data || e.message);
+    throw new Error(`Erreur API YouSign (${endpoint})`);
+  }
+};
 
+export async function POST(req: NextRequest) {
+  try {
+    const { fileName, signerEmail, signerName, currentLm } = await req.json();
 
-    const response = await fetch(apiUrl, {
+    if (!fileName || !signerEmail || !signerName) {
+      return new Response(JSON.stringify({ message: 'Champs manquants' }), { status: 400 });
+    }
+
+    // Chemin absolu vers le fichier dans /public/assets
+    const filePath = path.join(process.cwd(), 'public', 'assets', fileName);
+
+    // Lire le fichier local en buffer
+    const fileBuffer = await fs.readFile(filePath);
+
+    // 1. Créer la demande de signature
+    const signatureRequest = await request('signature_requests', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        documents: [
-          {
-            file_url: fileUrl, 
-            name: 'Lettre de mission',
-          },
-        ],
-        signers: [
-          {
-            email: signerEmail, 
-            first_name: signerName.split(' ')[0], 
-            last_name: signerName.split(' ')[1], 
-            language: 'fr',
-          },
-        ],
+      data: JSON.stringify({
+        name: `Lettre de mission ${currentLm}`,
+        delivery_mode: 'email',
+        timezone: 'Europe/Paris',
       }),
+    }, {
+      'Content-Type': 'application/json',
     });
 
-    console.log('Test2',`Bearer ${apiKey}`)
+    const signatureRequestId = signatureRequest.id;
 
-    const responseData = await response.json();
-    console.log('Test3',responseData,responseData.id)
-    return new Response(JSON.stringify({ requestId: responseData.id }), { status: 200 });
+    // 2. Uploader le fichier dans la signature request
+    const form = new FormData();
+    form.append('file', fileBuffer, {
+      filename: fileName,
+      contentType: 'application/pdf',
+    });
+    form.append('nature', 'signable_document');
+    form.append('parse_anchors', 'true');
+
+    const uploadedDocument = await request(
+      `signature_requests/${signatureRequestId}/documents`,
+      {
+        method: 'POST',
+        data: form,
+      },
+      form.getHeaders()
+    );
+
+    const documentId = uploadedDocument.id;
+
+    // 3. Ajouter le signataire
+    const [first_name, last_name] = signerName.split(' ');
+
+    await request(
+      `signature_requests/${signatureRequestId}/signers`,
+      {
+        method: 'POST',
+        data: JSON.stringify({
+          info: {
+            first_name,
+            last_name,
+            email: signerEmail,
+            locale: 'fr',
+          },
+          signature_level: 'electronic_signature',
+          signature_authentication_mode: 'no_otp',
+          fields: [
+            {
+              document_id: documentId,
+              type: 'signature',
+              page: 1,
+              x: 100,
+              y: 600,
+            },
+          ],
+        }),
+      },
+      { 'Content-Type': 'application/json' }
+    );
+
+    // 4. Activer la demande
+    await request(`signature_requests/${signatureRequestId}/activate`, {
+      method: 'POST',
+    });
+
+    return new Response(
+      JSON.stringify({ message: 'Signature demandée', id: signatureRequestId }),
+      { status: 200 }
+    );
   } catch (error) {
-    console.error('Erreur lors de l\'envoi du document à signer', error);
-    return new Response(JSON.stringify({ message: 'Erreur lors de l\'envoi du document à signer' }), { status: 500 });
+    console.error('Erreur globale :', error);
+    return new Response(JSON.stringify({ message: 'Erreur dans la signature' }), { status: 500 });
   }
 }
 
 export async function GET() {
-  return new Response('GET method not supported for this route', { status: 405 });
+  return new Response('Méthode GET non autorisée.', { status: 405 });
 }

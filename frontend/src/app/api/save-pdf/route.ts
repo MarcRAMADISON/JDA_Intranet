@@ -20,13 +20,12 @@ export async function POST(req: Request) {
 
 
   // Chemin où enregistrer le fichier PDF dans public/assets
-  const absolutePath = path.join(process.cwd(), 'public', 'assets', `modified${timedate}.pdf`);
+  const absolutePath = path.join(process.cwd(), 'public', 'assets', `lettre_de_mission${timedate}.pdf`);
   const filePath = absolutePath.replace(/^.*\\public\\/, '/')
 
   // Sauvegarder le fichier dans public/assets
   fs.writeFile(absolutePath, buffer, (err) => {
     if (err) {
-      console.log('filePath1',filePath)
 
       return new Response(
         JSON.stringify({ error: 'Erreur lors de l\'enregistrement du fichier' }),
@@ -34,7 +33,6 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log('filePath2',filePath)
 
     return new Response(
       JSON.stringify({ message: 'Fichier PDF sauvegardé avec succès', filePath, absolutePath }),
