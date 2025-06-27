@@ -220,7 +220,7 @@ function AddFiche({ setReload, openModal, setOpenModal, row }: any) {
             if (values?.statut === "A signer") {
               setOpenModalSendLM(true);
             }
-            //setValues(defaultValues);
+            setValues(defaultValues);
           }
         });
        

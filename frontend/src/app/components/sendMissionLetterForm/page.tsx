@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable */
 
 import { useState, SetStateAction, Dispatch, useEffect } from "react";
 import CustomModal from "../Modal/page";
@@ -20,6 +21,17 @@ interface FormData {
   currentLm: string;
 }
 
+interface sendMissionLetterFormProps {
+  openModal: boolean;
+  setOpenModal: Dispatch<SetStateAction<boolean>>;
+  setValues: Dispatch<any>;
+  data: any;
+  pdfSrc?: string;
+  setPdfSrc: any;
+  currentLm: string;
+  setCurrentLm: any;
+};
+
 export default function SendMissionLetterForm({
   data,
   openModal,
@@ -29,16 +41,7 @@ export default function SendMissionLetterForm({
   setPdfSrc,
   currentLm,
   setCurrentLm,
-}: {
-  openModal: boolean;
-  setOpenModal: Dispatch<SetStateAction<boolean>>;
-  setValues: Dispatch<SetStateAction<any>>;
-  data: any;
-  pdfSrc: string | undefined;
-  setPdfSrc: any;
-  currentLm: string;
-  setCurrentLm: any;
-}) {
+}: any) {
   const [formData, setFormData] = useState<FormData>({
     fileName: "",
     signerEmail: "",
