@@ -515,7 +515,7 @@ import { PDFDocument, rgb } from "pdf-lib";
 
   const pdfBase64 = Buffer.from(pdfBytes).toString("base64");
 
-  const response = await fetch(`/api/save-pdf`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_FRONT_API_URL}/api/save-pdf`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -532,7 +532,7 @@ export const deleteFile=(pdfSrc:string | undefined)=>{
   const normalizedPath = pdfSrc?.replace(/\\/g, "/");
   const fileName = normalizedPath?.split("/").pop();
 
-  fetch("/api/delete-pdf", {
+  fetch(`${process.env.NEXT_PUBLIC_FRONT_API_URL}/api/delete-pdf`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ filename: fileName }),

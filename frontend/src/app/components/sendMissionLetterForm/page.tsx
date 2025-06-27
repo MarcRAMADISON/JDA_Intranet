@@ -74,7 +74,7 @@ export default function SendMissionLetterForm({
 
     try {
       // Appel à l'API Next.js pour envoyer la demande de signature à Yousign
-      const response = await fetch("/api/sendToSign", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_FRONT_API_URL}/api/sendToSign`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
