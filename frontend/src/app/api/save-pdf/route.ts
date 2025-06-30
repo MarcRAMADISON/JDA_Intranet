@@ -1,7 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
 import moment from "moment";
-import { exec } from "child_process";
 
 export async function OPTIONS() {
   return new Response(null, {
@@ -33,18 +32,11 @@ export async function POST(req: Request) {
 
     const fileName = `lettre_de_mission${timedate}.pdf`;
     const absolutePath = path.join(process.cwd(), "public", "assets", fileName);
-    const filePath = `/assets/${fileName}`;
+    const filePath = `${process.env.NEXT_PUBLIC_FRONT_API_URL}/api/pdf/${fileName}`;
+
 
     // Écriture du fichier
     await fs.writeFile(absolutePath, buffer);
-
-    exec(`chmod 644 "${absolutePath}"`, (err, stdout, stderr) => {
-      if (err) {
-        console.error("⚠️ Erreur chmod :", stderr);
-      } else {
-        console.log("✅ chmod appliqué :", stdout || "OK");
-      }
-    });
 
     return new Response(
       JSON.stringify({
