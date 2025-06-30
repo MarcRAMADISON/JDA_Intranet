@@ -27,7 +27,7 @@ const request = async (
     headers: {
       Authorization: `Bearer ${API_KEY}`,
       ...headers,
-      Referer: "http://51.210.150.198",
+      Referer: "https://www.jdadiffusion.fr",
     },
     ...options,
   };
