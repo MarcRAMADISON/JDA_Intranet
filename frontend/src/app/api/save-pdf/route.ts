@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import moment from "moment";
+import { exec } from "child_process";
 
 export async function OPTIONS() {
   return new Response(null, {
@@ -34,7 +35,17 @@ export async function POST(req: Request) {
     const absolutePath = path.join(process.cwd(), "public", "assets", fileName);
     const filePath = `/assets/${fileName}`;
 
+    // Écriture du fichier
     await fs.writeFile(absolutePath, buffer);
+
+    // Correction des permissions : ubuntu:ubuntu et chmod 644
+    exec(`chown ubuntu:ubuntu "${absolutePath}" && chmod 644 "${absolutePath}"`, (err, stdout, stderr) => {
+      if (err) {
+        console.error("⚠️ Erreur de permission : ", stderr);
+      } else {
+        console.log("✅ Permissions corrigées :", stdout || "OK");
+      }
+    });
 
     return new Response(
       JSON.stringify({
@@ -51,7 +62,7 @@ export async function POST(req: Request) {
       }
     );
   } catch (e) {
-    console.log(e)
+    console.log("❌ Erreur :", e);
     return new Response(
       JSON.stringify({ error: "Erreur lors de l'enregistrement du fichier" }),
       {
