@@ -38,12 +38,11 @@ export async function POST(req: Request) {
     // Écriture du fichier
     await fs.writeFile(absolutePath, buffer);
 
-    // Correction des permissions : ubuntu:ubuntu et chmod 644
-    exec(`chown ubuntu:ubuntu "${absolutePath}" && chmod 644 "${absolutePath}"`, (err, stdout, stderr) => {
+    exec(`chmod 644 "${absolutePath}"`, (err, stdout, stderr) => {
       if (err) {
-        console.error("⚠️ Erreur de permission : ", stderr);
+        console.error("⚠️ Erreur chmod :", stderr);
       } else {
-        console.log("✅ Permissions corrigées :", stdout || "OK");
+        console.log("✅ chmod appliqué :", stdout || "OK");
       }
     });
 
