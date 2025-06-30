@@ -2,7 +2,6 @@ import { NextRequest } from "next/server";
 import axios from "axios";
 import FormData from "form-data";
 import fs from "fs/promises";
-import path from "path";
 
 const BASE_URL = "https://api-sandbox.yousign.app/v3";
 const API_KEY = process.env.YOUSIGN_API_KEY || "REPLACE_WITH_YOUR_API_KEY";
@@ -53,7 +52,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Chemin absolu vers le fichier dans /public/assets
-    const filePath = path.join(process.cwd(), "public", "assets", fileName);
+    const filePath = `${process.env.NEXT_PUBLIC_FRONT_API_URL}/api/pdf/${fileName}`;
 
     // Lire le fichier local en buffer
     const fileBuffer = await fs.readFile(filePath);
