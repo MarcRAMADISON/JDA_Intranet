@@ -4,7 +4,7 @@ import path from "path";
 
 export async function GET(
   request: NextRequest,
-  context: { params: { name: string } }
+  context: any
 ) {
   const { name } = context.params;
   const filePath = path.join(process.cwd(), "public", "assets", name);
