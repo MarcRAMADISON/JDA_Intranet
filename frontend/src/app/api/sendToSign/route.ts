@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import axios from "axios";
 import FormData from "form-data";
-import fs from "fs/promises";
 
 const BASE_URL = "https://api-sandbox.yousign.app/v3";
 const API_KEY = process.env.YOUSIGN_API_KEY || "REPLACE_WITH_YOUR_API_KEY";
@@ -52,10 +51,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Chemin absolu vers le fichier dans /public/assets
-    const filePath = `${process.env.NEXT_PUBLIC_FRONT_API_URL}/api/pdf/${fileName}`;
-
-    // Lire le fichier local en buffer
-    const fileBuffer = await fs.readFile(filePath);
+    const url = `${process.env.NEXT_PUBLIC_FRONT_API_URL}/api/pdf/${fileName}`;
+    const res = await fetch(url);
+    
+    if (!res.ok) throw new Error("Erreur lors de la récupération du PDF");
+    
+    const arrayBuffer = await res.arrayBuffer();
+    const fileBuffer = Buffer.from(arrayBuffer);
 
     // 1. Créer la demande de signature
     const signatureRequest = await request(
