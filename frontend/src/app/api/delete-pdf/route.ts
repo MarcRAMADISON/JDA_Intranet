@@ -1,6 +1,17 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
+}
+
 export async function DELETE(req: Request) {
   try {
     const { filename } = await req.json(); 
