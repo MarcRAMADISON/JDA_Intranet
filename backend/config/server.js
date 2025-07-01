@@ -4,5 +4,5 @@ module.exports = ({ env }) => ({
   app: {
     keys: env.array('APP_KEYS'),
   },
-  url: env('PUBLIC_URL', 'https://51.210.150.198/api'),
+  url: env('PUBLIC_URL', 'https://intranet.jdadiffusion.fr/api'),
 });
