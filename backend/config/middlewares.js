@@ -5,7 +5,7 @@ module.exports = [
     name: 'strapi::cors',
     config: {
       enabled: true,
-      origin: ['http://localhost:3000', 'https://intranet.jdadiffusion.fr'], // mets ici tes vraies origines
+      origin: ['http://localhost:3000', 'https://intranet.jdadiffusion.fr',"https://51.210.150.198"], // mets ici tes vraies origines
       headers: '*',
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       credentials: true,
