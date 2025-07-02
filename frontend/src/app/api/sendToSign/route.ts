@@ -30,7 +30,6 @@ const request = async (
     headers: {
       Authorization: `Bearer ${API_KEY}`,
       ...headers,
-      Referer: "https://www.jdadiffusion.fr",
     },
     ...options,
   };
