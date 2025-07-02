@@ -25,7 +25,8 @@ export async function POST(req: Request) {
         status: 400,
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": allowedOrigin,
+          "Access-Control-Allow-Credentials": "true",
         },
       });
     }
@@ -37,8 +38,6 @@ export async function POST(req: Request) {
     const absolutePath = path.join(process.cwd(), "public", "assets", fileName);
     const filePath = `${process.env.NEXT_PUBLIC_FRONT_API_URL}/api/pdf/${fileName}`;
 
-
-    // Écriture du fichier
     await fs.writeFile(absolutePath, buffer);
 
     return new Response(
@@ -51,19 +50,21 @@ export async function POST(req: Request) {
         status: 200,
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": allowedOrigin,
+          "Access-Control-Allow-Credentials": "true",
         },
       }
     );
   } catch (e) {
-    console.log("❌ Erreur :", e);
+    console.error("❌ Erreur :", e);
     return new Response(
       JSON.stringify({ error: "Erreur lors de l'enregistrement du fichier" }),
       {
         status: 500,
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": allowedOrigin,
+          "Access-Control-Allow-Credentials": "true",
         },
       }
     );
