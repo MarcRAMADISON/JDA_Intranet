@@ -5,13 +5,16 @@ import FormData from "form-data";
 const BASE_URL = "https://api-sandbox.yousign.app/v3";
 const API_KEY = process.env.YOUSIGN_API_KEY || "REPLACE_WITH_YOUR_API_KEY";
 
+const allowedOrigin = "https://intranet.jdadiffusion.fr";
+
 export async function OPTIONS() {
   return new Response(null, {
     status: 204,
     headers: {
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": allowedOrigin,
       "Access-Control-Allow-Methods": "POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Credentials": "true",
     },
   });
 }

@@ -1,13 +1,16 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+const allowedOrigin = "https://intranet.jdadiffusion.fr";
+
 export async function OPTIONS() {
   return new Response(null, {
     status: 204,
     headers: {
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": allowedOrigin,
       "Access-Control-Allow-Methods": "POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Credentials": "true",
     },
   });
 }
