@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import axios from "axios";
 import FormData from "form-data";
 
-const BASE_URL = "https://api-sandbox.yousign.app/v3";
+const BASE_URL = "https://api.yousign.app/v3"//"https://api-sandbox.yousign.app/v3";
 const API_KEY = process.env.YOUSIGN_API_KEY || "REPLACE_WITH_YOUR_API_KEY";
 
 const allowedOrigin = "https://intranet.jdadiffusion.fr";
@@ -120,9 +120,9 @@ export async function POST(req: NextRequest) {
             {
               document_id: documentId,
               type: "signature",
-              page: 1,
-              x: 100,
-              y: 600,
+              page: 8,
+              x: 220,
+              y: 695,
             },
           ],
         }),

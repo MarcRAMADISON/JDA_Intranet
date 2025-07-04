@@ -93,7 +93,7 @@ export const sortData = (data: any) => {
     "Ne plus appeler",
     "Faux numéro",
     "Vente OK",
-  ]; 
+  ];
   const tableauTrie = data.sort((a: any, b: any) => {
     const indexA = priorites.indexOf(a?.statut);
     const indexB = priorites.indexOf(b?.statut);
@@ -270,10 +270,7 @@ export const statuts = [
   "Vente OK",
 ];
 
-export const statutsAgent= [
-  "A rappeler",
-  "A signer"
-]
+export const statutsAgent = ["A rappeler", "A signer"];
 
 export const getAnnualStat = ({
   year,
@@ -308,15 +305,15 @@ export const getAnnualStat = ({
             return moment(d.attributes.createdAt).month() === month.index;
           });
 
-          const filtredMonthlyData= (monthlyData || []).filter((d: any) => {
-            if(d?.attributes?.venduePar?.data){
-              return d?.attributes?.venduePar?.data?.id === idUser
-            }else if(d?.attributes?.userAssigne?.data){
-              return d?.attributes?.userAssigne?.data?.id === idUser
-            }else {
+          const filtredMonthlyData = (monthlyData || []).filter((d: any) => {
+            if (d?.attributes?.venduePar?.data) {
+              return d?.attributes?.venduePar?.data?.id === idUser;
+            } else if (d?.attributes?.userAssigne?.data) {
+              return d?.attributes?.userAssigne?.data?.id === idUser;
+            } else {
               return true;
             }
-         })
+          });
 
           const statutData = statuts.map((statut) => {
             return {
@@ -334,15 +331,15 @@ export const getAnnualStat = ({
           };
         });
 
-        const filtredGlobalData= (data.data || []).filter((d: any) => {
-          if(d?.attributes?.venduePar?.data){
-            return d?.attributes?.venduePar?.data?.id === idUser
-          }else if(d?.attributes?.userAssigne?.data){
-            return d?.attributes?.userAssigne?.data?.id === idUser
-          }else{
-            return true
-          } 
-       })
+        const filtredGlobalData = (data.data || []).filter((d: any) => {
+          if (d?.attributes?.venduePar?.data) {
+            return d?.attributes?.venduePar?.data?.id === idUser;
+          } else if (d?.attributes?.userAssigne?.data) {
+            return d?.attributes?.userAssigne?.data?.id === idUser;
+          } else {
+            return true;
+          }
+        });
 
         const filtredByStatut = statuts.map((statut) => {
           return {
@@ -361,7 +358,6 @@ export const getAnnualStat = ({
           },
         };
       }
-
     });
 };
 
@@ -382,17 +378,30 @@ export const defaultValues = {
   comment: "",
   siret: "",
   statutJuridique: "",
-  codePostal:"",
-  ville:""
+  codePostal: "",
+  ville: "",
 };
 
 import { PDFDocument, rgb } from "pdf-lib";
 
- export const handleAddTextToSpecificPage = async ({dataForm,currentLm}:{dataForm:any,currentLm:string}) => {
-  const file= currentLm === "access"? `/assets/lmAccess.pdf` : `/assets/lmPremium.pdf`
-  const existingPdfBytes = await fetch(file).then((res) =>
-    res.arrayBuffer()
-  );
+export const handleAddTextToSpecificPage = async ({
+  dataForm,
+  currentLm,
+}: {
+  dataForm: any;
+  currentLm: string;
+}) => {
+  const file =
+    currentLm === "access"
+      ? `/assets/lmAccess.pdf`
+      : currentLm === "premium"
+      ? `/assets/lmPremium.pdf`
+      : currentLm === "remise20"
+      ? "/assets/lmAccess20.pdf"
+      : currentLm === "remise30"
+      ? "/assets/lmAccess30.pdf"
+      : "/assets/lmAccess50.pdf";
+  const existingPdfBytes = await fetch(file).then((res) => res.arrayBuffer());
 
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
 
@@ -497,7 +506,7 @@ import { PDFDocument, rgb } from "pdf-lib";
 
   endPage.drawText(`${dataForm["responsable"]}`, {
     x: 220,
-    y: currentLm === 'access'? 270 : 295,
+    y: currentLm === "access" ? 270 : currentLm === 'remise50'? 270 : 295,
     font,
     size: textSize,
     color: rgb(0, 0, 0),
@@ -505,7 +514,7 @@ import { PDFDocument, rgb } from "pdf-lib";
 
   endPage.drawText(`${moment().format("DD/MM/YYYY")}`, {
     x: 240,
-    y: currentLm === "access"? 210 : 230,
+    y: currentLm === "access" ? 210 : currentLm === 'remise50'? 210 : 230,
     font,
     size: textSize,
     color: rgb(0, 0, 0),
@@ -515,20 +524,23 @@ import { PDFDocument, rgb } from "pdf-lib";
 
   const pdfBase64 = Buffer.from(pdfBytes).toString("base64");
 
-  const response = await fetch(`${process.env.NEXT_PUBLIC_FRONT_API_URL}/api/save-pdf`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ pdf: pdfBase64 }),
-  })
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_FRONT_API_URL}/api/save-pdf`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ pdf: pdfBase64 }),
+    }
+  );
 
   const data = await response.json();
-  
-  return data
+
+  return data;
 };
 
-export const deleteFile=(pdfSrc:string | undefined)=>{
+export const deleteFile = (pdfSrc: string | undefined) => {
   const normalizedPath = pdfSrc?.replace(/\\/g, "/");
   const fileName = normalizedPath?.split("/").pop();
 
@@ -536,5 +548,5 @@ export const deleteFile=(pdfSrc:string | undefined)=>{
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ filename: fileName }),
-  })
-}
+  });
+};

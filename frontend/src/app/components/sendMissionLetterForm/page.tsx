@@ -3,7 +3,11 @@
 
 import { useState, SetStateAction, Dispatch, useEffect } from "react";
 import CustomModal from "../Modal/page";
-import { defaultValues, deleteFile, handleAddTextToSpecificPage } from "@/app/utils";
+import {
+  defaultValues,
+  deleteFile,
+  handleAddTextToSpecificPage,
+} from "@/app/utils";
 import {
   Button,
   FormControl,
@@ -30,7 +34,7 @@ interface sendMissionLetterFormProps {
   setPdfSrc: any;
   currentLm: string;
   setCurrentLm: any;
-};
+}
 
 export default function SendMissionLetterForm({
   data,
@@ -49,7 +53,7 @@ export default function SendMissionLetterForm({
     currentLm: "",
   });
   const [statusMessage, setStatusMessage] = useState<string>("");
-  const [loading,setLoading]=useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (data && pdfSrc && currentLm) {
@@ -68,19 +72,22 @@ export default function SendMissionLetterForm({
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-    setLoading(true)
+    setLoading(true);
 
     setStatusMessage("Envoi en cours...");
 
     try {
       // Appel à l'API Next.js pour envoyer la demande de signature à Yousign
-      const response = await fetch(`${process.env.NEXT_PUBLIC_FRONT_API_URL}/api/sendToSign`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_FRONT_API_URL}/api/sendToSign`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       const data = await response.json();
 
@@ -88,32 +95,32 @@ export default function SendMissionLetterForm({
         Swal.fire({
           title: "Document envoyé à signer",
           text: `Document envoyé à signer, ID de la demande : ${data.id}`,
-          icon: "success"
+          icon: "success",
         });
         setFormData({
           fileName: "",
           signerEmail: "",
           signerName: "",
           currentLm: "",
-        })
-        setOpenModal(false)
+        });
+        setOpenModal(false);
 
         setStatusMessage(
           `Document envoyé à signer, ID de la demande : ${data.id}`
         );
-        deleteFile(pdfSrc)
+        deleteFile(pdfSrc);
       } else {
         Swal.fire({
           title: "Document non envoyé",
           text: "Erreur lors de l'envoi du document à signer.",
-          icon: "error"
+          icon: "error",
         });
-        setOpenModal(false)
+        setOpenModal(false);
         setStatusMessage("Erreur lors de l'envoi du document à signer.");
       }
 
-      setCurrentLm('access')
-      setLoading(false)
+      setCurrentLm("access");
+      setLoading(false);
 
       setValues(defaultValues);
     } catch (error) {
@@ -135,15 +142,14 @@ export default function SendMissionLetterForm({
           name="controlled-radio-buttons-group"
           value={currentLm}
           onChange={(e) => {
-                deleteFile(pdfSrc)
-                handleAddTextToSpecificPage({
-                  dataForm: data,
-                  currentLm: e.target.value,
-                }).then((res: any) => {
-                  setPdfSrc(res.filePath);
-                });
-                setCurrentLm(e.target.value);
-             
+            deleteFile(pdfSrc);
+            handleAddTextToSpecificPage({
+              dataForm: data,
+              currentLm: e.target.value,
+            }).then((res: any) => {
+              setPdfSrc(res.filePath);
+            });
+            setCurrentLm(e.target.value);
           }}
         >
           <FormControlLabel
@@ -158,6 +164,24 @@ export default function SendMissionLetterForm({
             control={<Radio />}
             label="Premium"
           />
+          <FormControlLabel
+            sx={{ color: "#000" }}
+            value="remise20"
+            control={<Radio />}
+            label="20%"
+          />
+          <FormControlLabel
+            sx={{ color: "#000" }}
+            value="remise30"
+            control={<Radio />}
+            label="30%"
+          />
+          <FormControlLabel
+            sx={{ color: "#000" }}
+            value="remise50"
+            control={<Radio />}
+            label="50%"
+          />
         </RadioGroup>
       </FormControl>
 
@@ -168,7 +192,12 @@ export default function SendMissionLetterForm({
         style={{ border: "none" }}
       ></iframe>
 
-      <Button sx={{ mt: "20px" }} disabled={loading} variant="contained" onClick={handleSubmit}>
+      <Button
+        sx={{ mt: "20px" }}
+        disabled={loading}
+        variant="contained"
+        onClick={handleSubmit}
+      >
         Envoyer à signer
       </Button>
 
