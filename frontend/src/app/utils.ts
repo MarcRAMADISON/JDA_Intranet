@@ -399,7 +399,9 @@ export const handleAddTextToSpecificPage = async ({
       : currentLm === "remise20"
       ? "/assets/lmAccess20.pdf"
       : currentLm === "remise30"
-      ? "/assets/lmAccess30.pdf"
+      ? "/assets/lmAccess30.pdf" 
+      : currentLm === 'resa'
+      ? "/assets/resa.pdf"
       : "/assets/lmAccess50.pdf";
   const existingPdfBytes = await fetch(file).then((res) => res.arrayBuffer());
 
@@ -505,16 +507,16 @@ export const handleAddTextToSpecificPage = async ({
   );
 
   endPage.drawText(`${dataForm["responsable"]}`, {
-    x: 220,
-    y: currentLm === "access" ? 270 : currentLm === 'remise50'? 270 : 295,
+    x: currentLm === 'resa'? 360 : 220,
+    y: currentLm === "resa"? 270 : currentLm === "access" ? 270 : currentLm === 'remise50'? 270 : 295,
     font,
     size: textSize,
     color: rgb(0, 0, 0),
   });
 
   endPage.drawText(`${moment().format("DD/MM/YYYY")}`, {
-    x: 240,
-    y: currentLm === "access" ? 210 : currentLm === 'remise50'? 210 : 230,
+    x: currentLm === 'resa'? 370 : 240,
+    y: currentLm === "resa"? 215 :currentLm === "access" ? 210 : currentLm === 'remise50'? 210 : 230,
     font,
     size: textSize,
     color: rgb(0, 0, 0),

@@ -182,6 +182,12 @@ export default function SendMissionLetterForm({
             control={<Radio />}
             label="50%"
           />
+          <FormControlLabel
+            sx={{ color: "#000" }}
+            value="resa"
+            control={<Radio />}
+            label="RESA"
+          />
         </RadioGroup>
       </FormControl>
 

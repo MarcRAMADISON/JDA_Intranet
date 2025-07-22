@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
               document_id: documentId,
               type: "signature",
               page: 8,
-              x: 220,
+              x: currentLm === 'RESA'? 360 : 220,
               y: 695,
             },
           ],
